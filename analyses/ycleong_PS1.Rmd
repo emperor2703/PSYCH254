@@ -1,0 +1,206 @@
+---
+title: 'Psych 254 W15 PS #1'
+author: "Yuan Chang Leong"
+date: "January 12, 2015"
+output: html_document
+---
+
+First, we clear the workspace and load in some useful helper code.
+
+```{r prelims}
+rm(list=ls())
+source("../helper/useful.R")
+```
+
+Part 1: Data cleaning
+---------------------
+Before we load the data in R, let's take a look at it in excel. We see that there are unnecessary columns. Let's *keep only the relevant columns*, which are WorkerID, WorkTimeinSeconds, Input.condition, the three input prices and the three answer costs.  
+
+Next, we see that the numbers are not entered in consistent format. Let's *remove the 1000 seperator* and *convert spelled numbers to numeric format*. We save the edited file as a new .csv, `janiszewski_rep_exercise_interim.csv`, load it in, and take a look using `head()` and `summary()`.
+
+```{r data1}
+d <- read.csv("../data/janiszewski_rep_exercise_interim.csv")
+head(d)
+summary(d)
+```
+
+We see that subjects `A1VYX5VKZ0CTWU` and `A5IUO2T5MZQUZ` did the study more than once. Let's remove their data. 
+
+```{r}
+d1 = filter(d, WorkerId != "A1VYX5VKZ0CTWU") %>%  filter(WorkerId != "A5IUO2T5MZQUZ")
+summary(d1)
+```
+
+The dataset seems pretty reasonable now. 
+
+Part 2: Making these data tidy
+------------------------------
+
+Now let's start with the cleaned data, so that we are all beginning from the same place.
+
+```{r data2}
+d <- read.csv("../data/janiszewski_rep_cleaned.csv")
+```
+
+This data frame is in *wide* format - that means that each row is a participant and there are multiple observations per participant. This data is not *tidy*.
+
+To make this data tidy, we'll do some cleanup. First, we *remove the unnecessary columns* using the verb `select`.
+
+```{r select}
+d.tidy <- select(d,WorkerId,WorkTimeInSeconds,starts_with("Input."),starts_with("Answer"))
+```
+
+Then we *rename* the columns to more sensible names. 
+
+```{r rename}
+d.tidy <- d %>% 
+  select(WorkerId,
+         WorkTimeInSeconds,
+         starts_with("Input."),
+         starts_with("Answer")) %>% 
+  rename(ID = WorkerId, 
+         RT = WorkTimeInSeconds, 
+         Condition = Input.condition, 
+         Input.Expensive = Input.price1, 
+         Input.Middle = Input.price2, 
+         Input.Cheap = Input.price3, 
+         Expensive = Answer.plasma_cost, 
+         Middle = Answer.dog_cost, 
+         Cheap = Answer.sushi_cost)
+
+# Change column orders of expensive and middle so that it is more sensible
+d.tidy = d.tidy[c(1:6,8,7,9)]
+head(d.tidy)
+```
+
+We use the verb *gather* to turn this into a *tidy* data frame.
+
+```{r gather}
+d.tidy = d.tidy %>% gather("ItemType","Response",7:9)
+head(d.tidy)
+```
+
+The dataset is now *tidy*.  
+
+Bonus problem: *spread* these data back into a wide format data frame.
+
+```{r spread}
+d.wide = spread(d.tidy,"ItemType", "Response")
+head(d.wide)
+```
+
+Part 3: Manipulating the data using dplyr
+-----------------------------------------
+
+Try also using the dplyr `distinct` function to remove the duplicate participants from the raw csv file that you discovered in part 1.
+
+```{r}
+d.raw <- read.csv("../data/janiszewski_rep_exercise.csv")
+d.unique.subs <- d.raw %>% distinct(WorkerId)
+```
+
+I should note that this method retains one of the datapoints from each of the duplicate participant. I would prefer to remove all instances of duplicate participants.
+
+As we said in class, a good thing to do is always to check histograms of the response variable. Do that now, using either regular base graphics or ggplot. What can you conclude? 
+
+```{r}
+# Plot histogram
+qplot(Response, data=d.tidy, geom="histogram")
+```
+
+**There are three peaks in the histogram, probably because there were three items of very difference prices and the bets on each item clustered around each other.**  
+
+OK, now we turn to the actual data anlysis. We'll be using dplyr verbs to `filter`, `group`,`mutate`, and `summarise` the data.
+
+Start by using `summarise` on `d.tidy` to compute the mean bet across all participants. Note that this is simply taking the grand mean. Ultimately, we would like to compute the mean for different conditions and items, but this will come later. Right now we're just learning the syntax of `summarise`.
+
+```{r}
+# Compute Grand Mean
+summarise(d.tidy, mean(Response,na.rm = T))
+```
+
+Let's use that capacity to combine `summarise` with `group_by`, which allows us to break up our summary into groups. Try grouping by item and condition and taking means using `summarise`, chaining these two verbs with `%>%`.
+
+```{r}
+d.tidy %>% 
+  group_by(ItemType, Condition) %>% 
+  summarise(mean(Response,na.rm =T))
+```
+
+OK, it's looking like there are maybe some differences between conditions, but how are we going to plot these? They are fundamentally different magnitudes from one another. 
+
+Really we need the size of the deviation from the anchor, which means we need the anchor value (the `Input.price` variables that we've ignored up until now). Let's go back to the data and add that in.
+
+Take a look at this complex expression. You don't have to modify it, but see what is being done here with gather, separate and spread. Run each part (e.g. the first verb, the first two verbs, etc.) and after doing each, look at `head(d.tidy)` to see what they do. 
+
+```{r}
+d.tidy <- d %>%
+  select(WorkerId, Input.condition, 
+         starts_with("Answer"), 
+         starts_with("Input")) %>%
+  rename(workerid = WorkerId,
+         condition = Input.condition,
+         plasma_anchor = Input.price1,
+         dog_anchor = Input.price2,
+         sushi_anchor = Input.price3,
+         dog_cost = Answer.dog_cost,
+         plasma_cost = Answer.plasma_cost, 
+         sushi_cost = Answer.sushi_cost) %>%
+  gather(name, cost, 
+         dog_anchor, plasma_anchor, sushi_anchor, 
+         dog_cost, plasma_cost, sushi_cost) %>%
+  separate(name, c("item", "type"), sep = "_") %>%
+  spread(type, cost)
+```
+
+Now we can do the same thing as before but look at the relative difference between anchor and estimate. Let's do this two ways: 
+
+* By computing absolute value of percentage change in price, and 
+* By computing z-scores over items.
+
+To do the first, use the `mutate` verb to add a percent change column, then comute the same summary as before. 
+
+```{r}
+pcts <- d.tidy %>%
+  mutate(pct_change = abs((cost - anchor))/anchor * 100) %>%
+  group_by(item,condition) %>% 
+  summarise(pct = mean(pct_change,na.rm =T))
+```
+
+To do the second, you will need to `group` first by item, compute z-scores with respect to items, then further group by condition.
+
+HINT: `scale(x)` returns a complicated data structure that doesn't play nicely with dplyr. try `scale(x)[,1]` to get what you need.
+
+HINT: by default, `group_by` undoes any previous groupings. If you want to add new grouping variables *on top* of pre-existing ones, specify `add = TRUE`, e.g., `d %>% group_by(var1) %>% group_by(var2, add = TRUE)`.
+
+```{r}
+z.scores <- d.tidy %>% 
+  group_by(item) %>% 
+  mutate(change = abs((cost - anchor))) %>% 
+  mutate(z = scale(change)[,1]) %>%
+  group_by(condition, add = T) %>%
+  summarise(z = mean(z,na.rm =T))
+```
+
+OK, now here comes the end: we're going to plot the differences and see if anything happened. First the percent change:
+
+```{r}
+qplot(item, pct, fill=condition,
+      position="dodge",
+      stat="identity", geom="bar",
+      data=pcts)
+```
+
+and the z-scores:
+
+```{r}
+qplot(item, z, fill=condition,
+      position="dodge",
+      stat="identity", geom="bar",
+      data=z.scores)
+```
+
+We see that for the dog and sushi, there was indeed a greater adjustment away from a rounded anchor than precise anchors. However, for the plasma tv, participants adjusted more for the precise under anchor than the rounded anchor. Interestingly, adjustment was smallest for the precise under anchor for the other two items (dog and sushi). 
+
+Oh well. This replication didn't seem to work out straightforwardly.
+
