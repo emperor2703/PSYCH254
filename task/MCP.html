@@ -1,0 +1,102 @@
+<html>
+<head>
+	<title>Moral Character and Personality</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<!-- <script src="http://longouyang.github.com/mmturkey/mmturkey.js"></script> -->
+	<link rel="stylesheet" href="style.css"/>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" rel="stylesheet" type="text/css"></link>
+
+	<!-- jsPsych -->
+	<script src="jsPsych-4.0.1/jspsych.js"></script>
+	<script src="jsPsych-4.0.1/plugins/jspsych-survey-likert.js"></script>
+	<!-- style -->
+	<link href="jsPsych-4.0.1/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+
+</head>
+<body>
+
+<!-- The instructions slide. -->
+<div class="slide" id="instructions">
+    <p id='logo-text'>Evaluating Moral Character and Personality</p>
+	<p class="block-text">In this experiment, you will read a parapragh about two different individuals. You will then be asked to evaluate their moral character and personality. 
+	</p>
+	<button type="button" onclick="this.blur(); experiment.vignette()">Start</button>
+
+	<p class="block-text" id="legal">Legal information: By answering the following questions, you are participating in a study being performed by cognitive scientists in the Stanford Department of Psychology. If you have questions about this research, please contact Yuan Chang Leong at <a href="mailto://ycleong@stanford.edu">ycleong@stanford.edu</a>.You must be  at least 18 years old to participate. Your participation in this research is voluntary. You may decline to answer any or all of the following questions. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.</p>
+</div>
+
+<div class="slide" id="moral">
+	<p>
+		Please read the following paragraph carefully. You will be asked questions about Justin and Nate on the next page. 
+<br><br>
+		Justin and Nate independently came upon two seperate cash-filled wallets in the parking lot of a local grocery store. Justin was able to decide quickly what to do. Nate was only able to decide after long and careful deliberation. 
+<br><br> 
+		Both men did not steal the money but instead left the wallet with customer service.
+<br>
+		<center><button type="button" onclick="this.blur(); experiment.MC1()">Continue</button></center>
+	</p>
+	</p>
+</div>
+
+<div class="slide" id="immoral">
+	<p>
+		Please read the following paragraph carefully. You will be asked questions about Justin and Nate on the next page. 
+<br><br>
+		Justin and Nate independently came upon two seperate cash-filled wallets in the parking lot of a local grocery store. Justin was able to decide quickly what to do. Nate was only able to decide after long and careful deliberation. 
+<br><br> 
+		Both men pocketed the money and drove off.
+<br>
+		<center><button type="button" onclick="this.blur(); experiment.MC1()">Continue</button></center>
+	</p>
+	</p>
+</div>
+
+
+<div class="slide" id="MC1">
+	<p>
+		Please read the following paragraph carefully. You will be asked questions about Justin and Nate on the next page. 
+<br><br>
+		Justin and Nate independently came upon two seperate cash-filled wallets in the parking lot of a local grocery store. Justin was able to decide quickly what to do. Nate was only able to decide after long and careful deliberation. 
+<br><br> 
+		Both men pocketed the money and drove off.
+<br>
+		<center><button type="button" onclick="this.blur(); experiment.MC1()">Continue</button></center>
+	</p>
+	</p>
+</div>
+
+
+
+
+
+
+
+<div class="slide" id="stage">
+	<p id="number">{{}}</p>
+</div>
+
+
+<!-- The finish slide. -->
+<div class="slide" id="finished">
+	You're finished - thanks for participating! Submitting to Mechanical Turk...
+</div>
+
+<!-- Include the <a href="experiment.html">JavaScript file for the experiment</a>. As written, that script immediately executes commands, so we include it here at the end of the HTML file to ensure that resources referenced by the script actually exist. For instance, one of the immediately executed commands is <code>showSlide("instructions")</code>. If we loaded experiment.js, say, in the <code>head</code> section, <code>showSlide("instructions")</code> would fail because the <code>instructions</code> slide doesn't exist yet. It is possible to load the script in <code>head</code> but you have to ensure that any immediately executed commands, if they rely on potentially uninitialized HTMl elements, are _delayed_ until the page is ready, using either [window.onload][onload] or jQuery's more robust [$(document).ready()][domReady]  -->
+<!-- [onload]: https://developer.mozilla.org/en/DOM/window.onload -->
+<!-- [domReady]: http://api.jquery.com/ready/ -->
+<script src="experiment.js"></script>
+<script>
+var obj = JSON.parse('[{"stimulus":8,"accuracy":0,"rt":965},{"stimulus":4,"accuracy":1,"rt":185},{"stimulus":3,"accuracy":1,"rt":122},{"stimulus":7,"accuracy":0,"rt":99},{"stimulus":5,"accuracy":1,"rt":98},{"stimulus":6,"accuracy":0,"rt":200},{"stimulus":2,"accuracy":0,"rt":141},{"stimulus":1,"accuracy":1,"rt":286},{"stimulus":9,"accuracy":1,"rt":291}]');
+//turk.submit([{a :1},{b: 2}]);
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
