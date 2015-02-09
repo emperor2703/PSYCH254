@@ -66,7 +66,16 @@ This stuff will vary by experiment.
   color: #FFFFFF;
 }
 
-#moral, #immoral, #MC1 {
+#survey{
+  color: #FFFFFF;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+
+
+
+#moral, #immoral{
   margin-bottom: 10em;
   width: 500px;
   text-align: justify;

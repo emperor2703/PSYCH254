@@ -53,13 +53,13 @@ var experiment = {
   showSlide("immoral");
   },
 
-  MC1: function(){
-  showSlide("MC1");
+  survey: function(){
+  showSlide("survey");
   },
 
 
   // The function that gets called when the stream is finished
-  end: function() {
+ submit: function() {
     showSlide("finished");
     // wait 1.5 seconds and then submit to Mechanical Turk
     turk.submit(experiment);
