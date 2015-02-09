@@ -50,11 +50,15 @@ var experiment = {
   data: [],
 
   vignette: function(){
-  showSlide("immoral");
+  showSlide("quick");
+  },
+
+  outcome: function(){
+  showSlide("moral");
   },
 
   survey: function(){
-  showSlide("survey");
+  showSlide("survey_quick");
   },
 
 

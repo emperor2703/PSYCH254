@@ -5,6 +5,12 @@ function showSlide(id) {
 
 showSlide("instructions");
 
+
+
+
+
+
+
 // Get random integers.
 // When called with no arguments, it returns either 0 or 1. When called with one argument, *a*, it returns a number in [*0*,*a-1*]. When called with two arguments, *a* and *b*, returns a random value in [*a*,*b*].
 function random(a,b) {
@@ -49,8 +55,8 @@ var experiment = {
   keyBindings: myKeyBindings,
   data: [],
 
-  vignette: function(){
-  showSlide("quick");
+  task: function(){
+  showSlide("task");
   },
 
   outcome: function(){

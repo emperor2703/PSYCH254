@@ -66,7 +66,7 @@ This stuff will vary by experiment.
   color: #FFFFFF;
 }
 
-#survey{
+#survey_quick{
   color: #FFFFFF;
   font-size: 18px;
   line-height: 24px;
@@ -75,7 +75,7 @@ This stuff will vary by experiment.
 
 
 
-#moral, #immoral{
+#quick, #slow, #moral, #immoral{
   margin-bottom: 10em;
   width: 500px;
   text-align: justify;

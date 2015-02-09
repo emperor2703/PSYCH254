@@ -72,8 +72,16 @@ This stuff will vary by experiment.
   line-height: 24px;
 }
 
-
-
+#jspsych_target{
+  margin-bottom: 10em;
+  width: 500px;
+  text-align: justify;
+  color: #FFFFFF;
+  font-size: 18px;
+  margin: 0 auto;
+  margin-bottom: 1em;
+  line-height: 24px;
+}
 
 #quick, #slow, #moral, #immoral{
   margin-bottom: 10em;
