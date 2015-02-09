@@ -1,0 +1,51 @@
+<html>
+<head>
+	<title>Moral Character and Personality</title>
+    <!-- jQuery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" rel="stylesheet" type="text/css"></link>
+	<link rel="stylesheet" href="style.css"/>
+
+	<!-- jsPsych -->
+	<script src="jsPsych-4.0.1/jspsych.js"></script>
+	<script src="jsPsych-4.0.1/plugins/jspsych-survey-likert.js"></script>
+	<script src="jsPsych-4.0.1/plugins/jspsych-single-stim.js"></script>
+	<script src="jsPsych-4.0.1/plugins/jspsych-text.js"></script>
+    <script src="jsPsych-4.0.1/plugins/jspsych-html.js"></script>
+	<!-- style -->
+	<link href="jsPsych-4.0.1/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+
+</head>
+<body>
+<div id="jspsych_target"></div>
+</body>
+
+<script type="text/javascript">
+// Experiment Instructions
+var check_consent = function(elem) {
+            if ($('#consent_checkbox').is(':checked')) {
+                return true;
+            }
+            else {
+                alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+                return false;
+            }
+            return false;
+        };
+
+
+        // declare the block.
+        var html_block = {type:'html', pages: [{url: "instructions.html", cont_btn: "start", check_fn: check_consent}]};
+
+
+
+        jsPsych.init({
+            display_element: $('#jspsych_target'),
+            experiment_structure: [html_block],
+            on_finish:function(data){
+                jsPsych.dataAPI.displayData();
+            }
+        });
+    </script>
+</html>
