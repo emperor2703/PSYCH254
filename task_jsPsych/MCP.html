@@ -84,26 +84,15 @@ var MC = {
 
 the_experiment.push(MC);
 
-var survey_questions = ["Do you think Justin has good or bad moral principles?", 
-    "Do you think Justin has good or bad moral standards?",
-    "Do you think deep down Justin has the moral principles and knowledge to do the right thing?",
-    "How conflicted do you think Justin felt when making his decision?",
-    "How many reservations do you think Justin had when making his decision?",
-    "Do you think Justin was quite certain in his decision?",
-    "How far do you think Justin was from choosing the alternate course of action?",
-    "To what extent do you think Justin remained calm and emotionally contained when making his decision?",
-    "To what extent do you think Justin became upset and acted without thinking?",
-    
-    "Do you think Nate has good or bad moral principles?", 
-    "Do you think Nate has good or bad moral standards?",
-    "Do you think deep down Nate has the moral principles and knowledge to do the right thing?",
-    "How conflicted do you think Nate felt when making his decision?",
-    "How many reservations do you think Nate had when making his decision?",
-    "Do you think Nate was quite certain in his decision, or did have considerable reservations?",
-    "How far do you think Nate was from choosing the alternate course of action?",
-    "To what extent do you think Nate remained calm and emotionally contained when making his decision?",
-    "To what extent do you think Nate became upset and acted without thinking?"
-    ];
+var J1 = ["Do you think Justin has good or bad moral principles?"]
+var J2 = ["Do you think Justin has good or bad moral standards?"] 
+var J3= ["Do you think deep down Justin has the moral principles and knowledge to do the right thing?"] 
+var J4 = ["How conflicted do you think Justin felt when making his decision?"]
+var J5 = ["How many reservations do you think Justin had when making his decision?"]
+var J6 = ["Do you think Justin was quite certain in his decision?"]
+var J7 = ["How far do you think Justin was from choosing the alternate course of action?"]
+var J8 = ["To what extent do you think Justin remained calm and emotionally contained when making his decision?"] 
+var J9 = ["To what extent do you think Justin became upset and acted without thinking?"]
 
 var s1 = ["Very Bad","Very Good"];
 var s2 = ["Very Bad","Very Good"];
@@ -115,14 +104,33 @@ var s7 = ["Very Far","Not Far"]
 var s8 = ["To a small extent","To a large extent"]
 var s9 = ["To a small extent","To a large extent"]
 
-var survey= {
+var survey_Justin = {
             type: 'survey-likert',
-            questions: [survey_questions],
-            labels: [[s1,s2,s3,s4,s5,s6,s7,s8,s9,s1,s2,s3,s4,s5,s6,s7,s8,s9]], // need one scale for every question on a page
-            intervals: [[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]] // note the the intervals and labels don't necessarily need to match.
+            questions: [J1,J2,J3,J4,J5,J6,J7,J8,J9],
+            labels:[[s1],[s2],[s3],[s4],[s5],[s6],[s7],[s8],[s9]], // need one scale for every question on a page
+            intervals:[[7],[7],[7],[7],[7],[7],[7],[7],[7]], // note the the intervals and labels don't necessarily need to match.
+            randomize_order: true
         };
+the_experiment.push(survey_Justin);
 
-the_experiment.push(survey);
+var N1 = ["Do you think Nate has good or bad moral principles?"]
+var N2 = ["Do you think Nate has good or bad moral standards?"] 
+var N3= ["Do you think deep down Nate has the moral principles and knowledge to do the right thing?"] 
+var N4 = ["How conflicted do you think Nate felt when making his decision?"]
+var N5 = ["How many reservations do you think Nate had when making his decision?"]
+var N6 = ["Do you think Nate was quite certain in his decision?"]
+var N7 = ["How far do you think Nate was from choosing the alternate course of action?"]
+var N8 = ["To what extent do you think Nate remained calm and emotionally contained when making his decision?"] 
+var N9 = ["To what extent do you think Nate became upset and acted without thinking?"]
+
+var survey_Nate = {
+            type: 'survey-likert',
+            questions: [N1,N2,N3,N4,N5,N6,N7,N8,N9],
+            labels: [[s1],[s2],[s3],[s4],[s5],[s6],[s7],[s8],[s9]], // need one scale for every question on a page
+            intervals: [[7],[7],[7],[7],[7],[7],[7],[7],[7]], // note the the intervals and labels don't necessarily need to match.
+            randomize_order: true
+        };
+the_experiment.push(survey_Nate);
 
 jsPsych.init({
     display_element: $('#jspsych_target'),
