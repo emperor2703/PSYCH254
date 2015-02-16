@@ -1,3 +1,5 @@
+<style> div.comment {color: blue} </style>
+
 ---
 title: 'Psych 254 W15 PS #2'
 author: "Yuan Chang Leong"
@@ -18,8 +20,12 @@ I've adapted this for psych 254 purposes
 
 First install and load the package.
 
-```{r}
-install.packages("ggplot2")
+```{r echo = FALSE}
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(tidyr)
+library(dplyr)
 library(ggplot2)
 ```
 
@@ -47,7 +53,7 @@ qplot(carat, price, data = diamonds, shape=cut, color = clarity)
 One of the primary benefits of `ggplot2` is the use of facets - also known as small multiples in the Tufte vocabulary. That last plot was probably hard to read. Facets could make it better. Try adding a `facets = x ~ y` argument. `x ~ y` means row facets are by x, column facets by y. 
 
 ```{r}
-qplot(carat, price, data = diamonds, color = clarity, facets = .~cut)
+qplot(carat, price, data = diamonds, facets = cut ~ clarity)
 ```
 
 But facets can also get overwhelming. Try to strike a good balance between color, shape, and faceting.
@@ -55,7 +61,7 @@ But facets can also get overwhelming. Try to strike a good balance between color
 HINT: `facets = . ~ x` puts x on the columns, but `facets = ~ x` (no dot) *wraps* the facets. These are underlying calls to different functions, `facet_wrap` (no dot) and `facet_grid` (two arguments). 
 
 ```{r}
-qplot(carat, price, data = diamonds, shape=cut, color = clarity, facets = .~ clarity)
+qplot(carat, price, data = diamonds, color=clarity, facets = ~ cut)
 ```
 
 The basic unit of a ggplot plot is a "geom" - a mapping between data (via an "aesthetic") and a particular geometric configuration on coordinate axes. 
@@ -63,16 +69,20 @@ The basic unit of a ggplot plot is a "geom" - a mapping between data (via an "ae
 Let's try some other geoms and manipulate their parameters. First, try a histogram (`geom="hist"`). 
 
 ```{r}
+binwidth = (range(diamonds$price)[2] - range(diamonds$price)[1])/30
+qplot(price, data=diamonds, geom="histogram",binwidth = binwidth)
 ```
 
 Now facet your histogram by clarity and cut. 
 
 ```{r}
+qplot(price, data=diamonds, geom="histogram",facets = cut ~ clarity,binwidth = binwidth)
 ```
 
 I like a slightly cleaner look to my plots. Luckily, ggplot allows you to add "themes" to your plots. Try doing the same plot but adding `+ theme_bw()` or `+ theme_classic()`. Different themes work better for different applications, in my experience. 
 
 ```{r}
+qplot(price, data=diamonds, geom="histogram",binwidth = binwidth,facets = cut ~ clarity) + theme_bw()
 ```
 
 Part 1B: Exploring ggplot2 using ggplot
@@ -93,12 +103,15 @@ Try writing this as a single set of additions (e.g. one line of R code, though y
 
 
 ```{r}
+ggplot(diamonds, aes(x=carat, y=price)) + geom_point() + geom_point(aes(colour = carat))
 ```
 
 
 You can also set the aesthetic separately for each geom, and make some great plots this way. Though this can get complicated. Try using `ggplot` to build a histogram of prices. 
 
 ```{r}
+ggplot(diamonds) + geom_histogram(aes(price),binwidth=binwidth)
+ggplot(diamonds) + geom_histogram(aes(x=price, fill=cut),binwidth=binwidth)
 ```
 
 Part 2: Diving into real data: Sklar et al. (2012)
@@ -109,9 +122,6 @@ Sklar et al. (2012) claims evidence for unconscious arithmetic processing. We're
 First let's set up a few preliminaries. 
 
 ```{r}
-library(tidyr)
-library(dplyr)
-
 sem <- function(x) {sd(x) / sqrt(length(x))}
 ci95 <- function(x) {sem(x) * 1.96}
 ```
@@ -130,16 +140,26 @@ d.b <- read.csv("../data/sklar_expt6b_corrected.csv")
 Gather these datasets into long form and get rid of the Xs in the headers.
 
 ```{r}
+d.a.tidy = d.a %>% gather("subid","RT",8:28) 
+d.a.tidy$subid = gsub("X","",d.a.tidy$subid)
+head(d.a.tidy) 
+
+d.b.tidy = d.b %>% gather("subid","RT",8:28) 
+d.b.tidy$subid= gsub("X","",d.b.tidy$subid)
+head(d.b.tidy) 
 ```
 
 Bind these together. Check out `bind_rows`.
 
 ```{r}
+d.tidy = bind_rows(d.a.tidy, d.b.tidy)
 ```
 
 Merge these with subject info. You will need to look into merge and its relatives, `left_join` and `right_join`. Call this dataframe `d`, by convention. 
 
 ```{r}
+subinfo$subid = as.character(subinfo$subid)  
+d = left_join(subinfo, d.tidy, by = "subid")
 ```
 
 Clean up the factor structure.
@@ -155,21 +175,37 @@ Data Analysis Preliminaries
 Examine the basic properties of the dataset. First, take a histogram.
 
 ```{r}
+qplot(d$RT)
 ```
 
 Challenge question: what is the sample rate of the input device they are using to gather RTs?
 
 ```{r}
+RT = unique(d$RT[order(d$RT)])
+RT
 ```
 
+<div class = "comment"> Looking at the list of unique RTs recorded, the measurements seem to occur at intervals of 36ms, with a plus-minus 1 second error that is probably associated with inprecision in trigerring the start of the experiment. The sampling rate of the input device is 1 sample every 36 ms or **27.8 Hertz**.
+</div>
+<br>
 Sklar et al. did two manipulation checks. Subjective - asking participants whether they saw the primes - and objective - asking them to report the parity of the primes (even or odd) to find out if they could actually read the primes when they tried. Examine both the unconscious and conscious manipulation checks (this information is stored in subinfo). What do you see? Are they related to one another?
 
 ```{r} 
+mean(subinfo$objective.test)
+mean(subinfo$subjective.test)
+
+res1 = glm(subjective.test ~ objective.test, data=d, family = binomial)
+summary(res1)
 ```
 
+<div class = "comment">
+Yes, there is a positive linear relationship between a subject's subjective test measure and his or her objective test measure (b = 9.36, z =37.1, p < 0.001).  
+</div>
+<br>
 OK, let's turn back to the measure and implement Sklar et al.'s exclusion criterion. You need to have said you couldn't see (subjective test) and also be not significantly above chance on the objective test (< .6 correct). Call your new data frame `ds`.
 
 ```{r}
+ds = filter(d,subjective.test == 0 & objective.test < 0.6)
 ```
 
 Sklar et al.'s analysis
@@ -180,29 +216,104 @@ Sklar et al. show a plot of a "facilitation effect" - the time to respond to inc
 HINT: first take averages within subjects, then compute your error bars across participants, using the `sem` function (defined above). 
 
 ```{r}
+res2 = ds %>%
+  filter(operand=="subtraction") %>%
+  group_by(subid,presentation.time,congruent) %>%
+  summarise(RT= mean(RT,na.rm=T)) %>%
+  spread(congruent,RT) %>%
+  mutate(diff = no-yes) %>%
+  group_by(presentation.time) %>%
+  summarise(facilitation = mean(diff), sem = sem(diff))
 ```
 
-Now plot this summary, giving more or less the bar plot that Sklar et al. gave (though I would keep operation as a variable here. Make sure you get some error bars on there (e.g. `geom_errorbar` or `geom_linerange`). 
+Now plot this summary, giving more or less the bar plot that Sklar et al. gave (though I would keep operation as a variable here. Make sure you get some error bars on there (e.g. `geom_errorbar` or `geom_linerange`).  
 
 ```{r}
+ggplot(res2, aes(x=presentation.time, y=facilitation)) + 
+  geom_bar(stat="identity",width=0.5) +
+  geom_errorbar(aes(ymax = facilitation + sem, ymin= facilitation - sem), width=0.15)
 ```
 
-What do you see here? How close is it to what Sklar et al. report? Do the error bars match? How do you interpret these data? 
+What do you see here? How close is it to what Sklar et al. report? Do the error bars match? How do you interpret these data?  
 
-Challenge problem: verify Sklar et al.'s claim about the relationship between RT and the objective manipulation check.
+<div class = "comment">
+The mean values are consistent with those reported in Sklar et al. However, the error bars are a lot bigger here. As discussed in class, this is because Sklar reported plus-minus 1/2 standard error rather than plus-minus 1 standard error.
+</div>
+<br>
+Challenge problem: verify Sklar et al.'s claim about the relationship between RT and the objective manipulation check.  
+
+Skylar's claim:  
+
+> To further examine awareness, we regressed subtraction facilitation scores (RTs for incongruent minus congruent trials) on objective block scores (centered so that a score of zero indicated chance level) (39). The results showed significant facilitation when accuracy in the objective block is at chance [β intercept = 14.78, t(15) = 3.91, P =0.001] and insignificant slope [β = 86.85, t(15) = 1.47, P = 0.161].  
 
 ```{r}
+d3 = ds %>%
+  filter(operand=="subtraction") %>%
+  group_by(subid,presentation.time,congruent) %>%
+  summarise(RT= mean(RT,na.rm=T)) %>%
+  spread(congruent,RT) %>%
+  mutate(diff = no-yes) %>%
+  left_join(subinfo,by="subid")
+
+summary(lm(diff ~ I(objective.test-0.5), data =d3))
 ```
+
+<div class = "comment">
+We replicate Skylar's results showing that the facilitation effect is significant when objective accuracy was at chance (b = 14.78, t(15) = 3.91, p = 0.001), and there is no linear relationship between objective accuracy and facilitation (b = 86.8, t = 1.47, p = 0.16)
+</div>
+
 
 Your own analysis
 -----------------
 
 Show us what you would do with these data, operating from first principles. What's the fairest plot showing a test of Sklar et al.'s original hypothesis that people can do arithmetic "non-consciously"?
 
+<div class = "comment">
+I would consider both addition and subtraction, and not discard any of the participants.
+</div>
+
+
 ```{r}
+res_my = d %>% group_by(subid,presentation.time,operand,congruent) %>%
+  summarise(RT= mean(RT,na.rm=T)) %>%
+  spread(congruent,RT) %>%
+  mutate(diff = no-yes) %>%
+  group_by(operand,presentation.time) %>%
+  summarise(facilitation = mean(diff), sem = sem(diff))
+
+ggplot(res_my, aes(x=presentation.time, y=facilitation)) + 
+  facet_wrap( ~ operand) +
+  geom_bar(stat="identity",width=0.5) +
+  geom_errorbar(aes(ymax = facilitation + sem, ymin= facilitation - sem), width=0.15)
 ```
+
+<div class = "comment">
+The plot suggests that participants demonstrate a facilitation effect when solving subtraction problems, but not when solving addition problems. In fact, there are hints that priming might impair performance on addition problems.  
+
+This plot is problematic because it doesn't control for participants' awareness of the primes. However, instead of discarding participants who performed above threshold on the awareness tests, we can try controlling for the effect of awareness in a linear mixed effects model.
+</div>
+<br>
 
 Challenge problem: Do you find any statistical support for Sklar et al.'s findings?
 
+Let's first test if there is a facilitation effect, controlling for performance on the awareness tests.  
+
 ```{r}
+d_my = d %>% group_by(subid,presentation.time,operand,congruent) %>%
+  summarise(RT= mean(RT,na.rm=T)) %>%
+  left_join(subinfo,by="subid") 
+
+summary(lmer(RT ~ congruent + subjective.test + I(objective.test-0.5) + (1|subid),d_my))
 ```
+
+When we don't differentiate between operation, congruent primes do not predict faster reaction times (b = -3.6, t = -0.69, p = 0.493), hence there is no evidence for a facilitation effect.  
+
+However, as we noticed in the earlier plot, and as argued by Skylar et al., the facilitation might be present only on the subtraction problems. Hence, we test another linear mixed effects model with a term for the interaction between prime congruency and operation on reaction time.
+
+```{r}
+summary(lmer(RT ~ subjective.test + I(objective.test-0.5) + congruent*operand + (1|subid),d_my))
+```
+
+It seems that that there is no significant interaction between prime congruency and operation on reaction time. In other words, there is also no evidence that the effect of prime congruency is different for addition problems and subtraction problems (b = -14.4, t(123) = -1.44, p = 0.151).  
+
+
