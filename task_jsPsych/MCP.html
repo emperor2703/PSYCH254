@@ -40,38 +40,31 @@ var the_experiment = [];
 
 var inst = '<p>Please read the following story carefully.</p><br><p><center>Press ENTER to continue.</center></p>'
 
-var story = '<p>Justin and Nate independently came upon two separate cash-filled wallets in the parking lot of a local grocery store. Justin was able to decide quickly what to do. Nate was only able to decide after long and careful deliberation.</p><br><p><center>Press ENTER to continue.</center></p>'
+var moral_story = '<p>Justin and Nate were walking to separate cars in the parking lot of Andronicos, a local grocery store, where they each spotted a different lost wallet next to the cars. Upon picking up the wallet and looking inside, each found several hundred dollars in cash. Each man considered whether he should return the wallet and money to the Customer Service desk at Andronicos, or pocket the money and drive away.</p><p> Justin saw his decision as an easy one and was <i> able to decide quickly. He did not steal the money </i> and instead left the wallet with Customer Service</p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation </i>. After several minutes of thinking in his car, <i> he too decided not to steal the money </i> and instead left the wallet with customer service </p>'
 
-var story_text = {
-    type:'text', 
-    text: [inst,story],
-    timing_post_trial:0,
-    cont_key: 13};
-
-the_experiment.push(story_text);
-
-var moral_d = '<p>Both men did not steal the money but instead left the wallet with customer service.</p><br><p><center>Press ENTER to continue.</center></p>'
-
-var immoral_d = '<p>Both men pocketed the money and drove off.</p><br><p><center>Press ENTER to continue.</center></p>'
+var immoral_story = '<p>Justin and Nate were walking to separate cars in the parking lot of Andronicos, a local grocery store, where they each spotted a different lost wallet next to the cars. Upon picking up the wallet and looking inside, each found several hundred dollars in cash. Each man considered whether he should return the wallet and money to the Customer Service desk at Andronicos, or pocket the money and drive away.</p><p> Justin saw his decision as an easy one and was <i> able to decide quickly. He pocketed the money and drove off </i></p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation </i>. After several minutes of thinking in his car, <i> he too decided to pocket the money and drive off</p>'
 
 
 if (Math.random() < 0.5){
-    var decision = {
+    var cond = 'moral';
+    var story = {
     type:'text', 
-    text: [moral_d],
+    text: [moral_story],
     timing_post_trial:0,
     cont_key: 13};
 }
 else {
-    var decision = {
+    var cond = 'immoral';
+    var story = {
     type:'text', 
-    text: [immoral_d],
+    text: [immoral_story],
     timing_post_trial:0,
     cont_key: 13};
 }
 
-the_experiment.push(decision);
+the_experiment.push(story);
 
+// Manipulation Check
 var MC_question = ["How quickly did Justin make his decision?", "How quickly did Nate make his decision?"];
 var scale_1 = ["Very Slowly","Very Quickly"];
 
@@ -81,54 +74,71 @@ var MC = {
             labels: [[scale_1,scale_1]], // need one scale for every question on a page
             intervals: [[7,7]] // note the the intervals and labels don't necessarily need to match.
         };
-
 the_experiment.push(MC);
 
-var J1 = ["Do you think Justin has good or bad moral principles?"]
-var J2 = ["Do you think Justin has good or bad moral standards?"] 
-var J3= ["Do you think deep down Justin has the moral principles and knowledge to do the right thing?"] 
-var J4 = ["How conflicted do you think Justin felt when making his decision?"]
-var J5 = ["How many reservations do you think Justin had when making his decision?"]
-var J6 = ["Do you think Justin was quite certain in his decision?"]
-var J7 = ["How far do you think Justin was from choosing the alternate course of action?"]
-var J8 = ["To what extent do you think Justin remained calm and emotionally contained when making his decision?"] 
-var J9 = ["To what extent do you think Justin became upset and acted without thinking?"]
+// Certainty
 
-var s1 = ["Very Bad","Very Good"];
-var s2 = ["Very Bad","Very Good"];
-var s3 = ["Very Unlikely","Very Likely"];
-var s4 = ["Very Conflicted","Not Conflicted"];
-var s5 = ["No Reservations","Many Reservations"];
-var s6 = ["Very Certain","Not Certain"]
-var s7 = ["Very Far","Not Far"]
+/* var J1 = ["How conflicted do you think Justin felt when making his decision?"]
+var J2 = ["How many reservations do you think Justin had when making his decision?"]
+var J3 = ["Do you think Justin was quite certain in his decision?"]
+var J4 = ["How far do you think Justin was from choosing the alternate course of action?"]*/
+
+var certainty_questions_J = ["How conflicted do you think Justin felt when making his decision?", "How many reservations do you think Justin had when making his decision?","Do you think Justin was quite certain in his decision?","How far do you think Justin was from choosing the alternate course of action?"]
+
+var s1 = ["Very Conflicted","Not Conflicted"];
+var s2 = ["No Reservations","Many Reservations"];
+var s3 = ["Very Certain","Not Certain"]
+var s4 = ["Very Far","Not Far"]
+
+// Moral Evaluation
+/* var J5 = ["Do you think Justin has good or bad moral principles?"]
+var J6 = ["Do you think Justin has good or bad moral standards?"] 
+var J7= ["Do you think deep down Justin has the moral principles and knowledge to do the right thing?"]*/
+
+var moral_questions_J = ["Do you think Justin has good or bad moral principles?","Do you think Justin has good or bad moral standards?","Do you think deep down Justin has the moral principles and knowledge to do the right thing?"]
+
+var s5 = ["Very Bad","Very Good"];
+var s6 = ["Very Bad","Very Good"];
+var s7 = ["Very Unlikely","Very Likely"];
+
+// Emotional Impulsivity
+/*var J8 = ["To what extent do you think Justin remained calm and emotionally contained when making his decision?"] 
+var J9 = ["To what extent do you think Justin became upset and acted without thinking?"]*/
+
+var emotional_questions_J = ["To what extent do you think Justin remained calm and emotionally contained when making his decision?","To what extent do you think Justin became upset and acted without thinking?"]
+
 var s8 = ["To a small extent","To a large extent"]
 var s9 = ["To a small extent","To a large extent"]
 
 var survey_Justin = {
             type: 'survey-likert',
-            questions: [J1,J2,J3,J4,J5,J6,J7,J8,J9],
-            labels:[[s1],[s2],[s3],[s4],[s5],[s6],[s7],[s8],[s9]], // need one scale for every question on a page
-            intervals:[[7],[7],[7],[7],[7],[7],[7],[7],[7]], // note the the intervals and labels don't necessarily need to match.
-            randomize_order: true
+            questions: [certainty_questions_J,moral_questions_J,emotional_questions_J],
+            labels:[[s1,s2,s3,s4],[s5,s6,s7],[s8,s9]], // need one scale for every question on a page
+            intervals:[[7,7,7,7],[7,7,7],[7,7]], // note the the intervals and labels don't necessarily need to match.
         };
 the_experiment.push(survey_Justin);
 
-var N1 = ["Do you think Nate has good or bad moral principles?"]
-var N2 = ["Do you think Nate has good or bad moral standards?"] 
-var N3= ["Do you think deep down Nate has the moral principles and knowledge to do the right thing?"] 
-var N4 = ["How conflicted do you think Nate felt when making his decision?"]
-var N5 = ["How many reservations do you think Nate had when making his decision?"]
-var N6 = ["Do you think Nate was quite certain in his decision?"]
-var N7 = ["How far do you think Nate was from choosing the alternate course of action?"]
+/*var N1 = ["How conflicted do you think Nate felt when making his decision?"]
+var N2 = ["How many reservations do you think Nate had when making his decision?"]
+var N3 = ["Do you think Nate was quite certain in his decision?"]
+var N4 = ["How far do you think Nate was from choosing the alternate course of action?"]
+var N5 = ["Do you think Nate has good or bad moral principles?"]
+var N6 = ["Do you think Nate has good or bad moral standards?"] 
+var N7= ["Do you think deep down Nate has the moral principles and knowledge to do the right thing?"]
 var N8 = ["To what extent do you think Nate remained calm and emotionally contained when making his decision?"] 
-var N9 = ["To what extent do you think Nate became upset and acted without thinking?"]
+var N9 = ["To what extent do you think Nate became upset and acted without thinking?"]*/
+
+var certainty_questions_N = ["How conflicted do you think Nate felt when making his decision?", "How many reservations do you think Nate had when making his decision?","Do you think Nate was quite certain in his decision?","How far do you think Nate was from choosing the alternate course of action?"]
+
+var moral_questions_N = ["Do you think Nate has good or bad moral principles?","Do you think Nate has good or bad moral standards?","Do you think deep down Nate has the moral principles and knowledge to do the right thing?"]
+
+var emotional_questions_N = ["To what extent do you think Nate remained calm and emotionally contained when making his decision?","To what extent do you think Nate became upset and acted without thinking?"]
 
 var survey_Nate = {
             type: 'survey-likert',
-            questions: [N1,N2,N3,N4,N5,N6,N7,N8,N9],
-            labels: [[s1],[s2],[s3],[s4],[s5],[s6],[s7],[s8],[s9]], // need one scale for every question on a page
-            intervals: [[7],[7],[7],[7],[7],[7],[7],[7],[7]], // note the the intervals and labels don't necessarily need to match.
-            randomize_order: true
+            questions: [certainty_questions_N,moral_questions_N,emotional_questions_N],
+            labels:[[s1,s2,s3,s4],[s5,s6,s7],[s8,s9]], // need one scale for every question on a page
+            intervals:[[7,7,7,7],[7,7,7],[7,7]], // note the the intervals and labels don't necessarily need to match.
         };
 the_experiment.push(survey_Nate);
 
