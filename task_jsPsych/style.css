@@ -6,10 +6,11 @@ This stuff can be ported from experiment to experiment.*/
 body {
 	padding: 0;
 	margin: 0;
-	font-family: Palatino Linotype, Bookman Antiqua, Palatino, serif;
+	/*font-family: Palatino Linotype, Bookman Antiqua, Palatino, serif;*/
+  font-family: sans-serif;
 	font-size: 16px;
 	line-height: 20px;
-	background-color: #000000;
+	background-color: #FFFFFF;
 }
 
 /** We manage display using "slides". A slide is a <code>div</code> that takes up the entire page. Only one slide should be visible at a time. Navigation between slides is most sensibly accomplished using using buttons, rather than keyboard events. */
@@ -25,14 +26,13 @@ body {
 input, select, button {font-family: Georgia, serif; font-size: 14px;}
 
 button {
-	background: url(images/button-gradient.png);
 	border: 1px solid #999;
 	border-top: 1px solid #e0e0e0;
 	border-left: 1px solid #e0e0e0;
 	margin: 10px;
 	padding-left: 5px;
 	padding-right: 5px;
-	height: 29px;
+	height: 40px;
 	min-width: 70px;
 }
 button:active {
@@ -58,25 +58,25 @@ This stuff will vary by experiment.
 
 #logo-text {
   font-weight: bold;
-  color: #FFFFFF;
+  color: #000000;
 }
 
 #instructions {
   text-align: center;
-  color: #FFFFFF;
+  color: #000000;
 }
 
 #survey_quick{
-  color: #FFFFFF;
+  color: #F00000;
   font-size: 18px;
   line-height: 24px;
 }
 
 #jspsych_target{
   margin-bottom: 10em;
-  width: 500px;
+  width: 600px;
   text-align: justify;
-  color: #FFFFFF;
+  color: #000000;
   font-size: 18px;
   margin: 0 auto;
   margin-bottom: 1em;
@@ -87,7 +87,7 @@ This stuff will vary by experiment.
   margin-bottom: 10em;
   width: 500px;
   text-align: justify;
-  color: #FFFFFF;
+  color: #000000;
   font-size: 18px;
   margin: 0 auto;
   margin-bottom: 1em;
@@ -109,14 +109,14 @@ This stuff will vary by experiment.
   text-align: justify;
   margin: 0 auto;
   margin-bottom: 1em;
-  color: #FFFFFF;
+  color: #000000;
 }
 
 #legal {
   margin: 0 auto;
   margin-top: 1.5em;
   font-size: 0.8em;
-  color: #FFFFFF;
+  color: #000000;
 }
 
 #number {
@@ -125,6 +125,11 @@ This stuff will vary by experiment.
   margin: 0 auto;
   text-align: center;
   width: 100px;
-  color: #FFFFFF;
+  color: #000000;
 }
 
+#jspsych-survey-likert-next{
+display:block;
+margin:auto;
+font-size: 16px;
+}
