@@ -127,7 +127,7 @@ jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
     on_finish: function() {
-        data = jsPsych.data({condition: cond});
+        data = jsPsych.data.getData()
         turk.submit(data)
         /*$('#jspsych_target').append($('<pre>', {
         html: JSON.stringify(data, undefined, 2)
