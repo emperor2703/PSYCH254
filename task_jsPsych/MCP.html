@@ -127,23 +127,10 @@ jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
     on_finish: function() {
-        var condition = {
-            decision: cond,
-        }
-
-        jsPsych.data.write(condition);
-
-
         var alldata = jsPsych.data.getData();
-        turk.submit(alldata)
+        alldata.push({condition: cond})        
+        turk.submit(alldata,true)
 
-        /*jsPsych.turk.submitToTurk(alldata);       
-        
-        /*data = jsPsych.data.getData()
-        */
-        /*$('#jspsych_target').append($('<pre>', {
-        html: JSON.stringify(data, undefined, 2)
-        }))*/
 }
 });
 </script>
