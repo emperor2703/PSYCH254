@@ -127,6 +127,13 @@ jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
     on_finish: function() {
+        var condition = {
+            decision: cond,
+        }
+
+        jsPsych.data.write(condition);
+
+
         var alldata = jsPsych.data.getData();
         turk.submit(alldata)
 
