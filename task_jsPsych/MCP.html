@@ -128,10 +128,12 @@ jsPsych.init({
     experiment_structure: the_experiment,
     on_finish: function() {
         var alldata = jsPsych.data.getData();
-        jsPsych.turk.submitToTurk(alldata);       
+        turk.submit(alldata)
+
+        /*jsPsych.turk.submitToTurk(alldata);       
         
         /*data = jsPsych.data.getData()
-        turk.submit(data)*/
+        */
         /*$('#jspsych_target').append($('<pre>', {
         html: JSON.stringify(data, undefined, 2)
         }))*/
