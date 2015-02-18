@@ -126,10 +126,8 @@ the_experiment.push(survey_Nate);
 jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
-    on_finish: function() {
-        data = jsPsych.data.dataAsCSV({condition: cond});
-        jsPsych.turk.submitToTurk(data)
-        
+    on_finish: function(data) {
+        jsPsych.turk.submitToTurk(data)       
         /*data = jsPsych.data.getData()
         turk.submit(data)*/
         /*$('#jspsych_target').append($('<pre>', {
