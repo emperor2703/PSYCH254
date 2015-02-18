@@ -126,7 +126,8 @@ the_experiment.push(survey_Nate);
 jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
-    on_finish: function(data) {
+    on_finish: function() {
+        data = jsPsych.data;
         jsPsych.turk.submitToTurk(data)       
         /*data = jsPsych.data.getData()
         turk.submit(data)*/
