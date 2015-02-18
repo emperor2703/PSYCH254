@@ -127,8 +127,8 @@ jsPsych.init({
     display_element: $('#jspsych_target'),
     experiment_structure: the_experiment,
     on_finish: function() {
-        var data = jsPsych.data.getData();
-        jsPsych.turk.submitToTurk(data)       
+        var alldata = jsPsych.data.getData();
+        jsPsych.turk.submitToTurk(alldata);       
         
         /*data = jsPsych.data.getData()
         turk.submit(data)*/
