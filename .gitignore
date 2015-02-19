@@ -1,0 +1,15 @@
+.DS_Store
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+
+#specific files
+auth.json
+mturk-and-gmail.txt
+my-own-auth.json
