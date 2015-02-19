@@ -139,7 +139,7 @@ jsPsych.init({
     on_finish: function() {
         var alldata = jsPsych.data.getData();
         alldata.push({condition: cond})        
-        turk.submit(alldata,true)
+        turk.submit(alldata)
 
 }
 });
