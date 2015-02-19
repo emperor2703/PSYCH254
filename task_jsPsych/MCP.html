@@ -44,6 +44,13 @@ else {
      var cond = 'immoral';
 }
 
+if (Math.random() < 0.5){
+    var version = 'original';
+}
+else {
+    var version = 'new';
+}
+
 var the_experiment = [];
 
 var inst = {
@@ -56,11 +63,23 @@ the_experiment.push(inst);
 
 var background ="<p>Justin and Nate were walking to separate cars in the parking lot of Andronico's, a local grocery store, where they each spotted a different lost wallet next to the cars. Upon picking up the wallet and looking inside, each found several hundred dollars in cash. Each man considered whether he should return the wallet and money to the Customer Service desk at Andronico's, or pocket the money and drive away.</p>"
 
-if (cond == 'moral') {
-    decision = '<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He did not steal the money </i> and instead left the wallet with Customer Service</p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided not to steal the money </i> and instead left the wallet with customer service. </i><br> </p>'
+if (version =="original"){
+
+    if (cond == 'moral') {
+        decision = '<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He did not steal the money </i> and instead left the wallet with Customer Service</p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided not to steal the money </i> and instead left the wallet with customer service. </i><br> </p>'
+    }
+    else {
+        decision ='<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He pocketed the money and drove off. </i></p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided to pocket the money and drive off</i></p>'
+    }
 }
+
 else {
-    decision ='<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He pocketed the money and drove off. </i></p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided to pocket the money and drive off</i></p>'
+    if (cond == 'moral') {
+        decision = '<p>Justin was <i>able to decide quickly. He did not steal the money</i> and instead left the wallet with Customer Service.</p><p> In contrast, Nate <i>was only able to decide after thinking for a long time. He too decided not to steal the money </i> and instead left the wallet with customer service. </i><br> </p>'
+    }
+    else {
+        decision ='<p>Justin was <i>able to decide quickly. He pocketed the money and drove off. </i></p><p> In contrast, Nate <i>was only able to decide after thinking for a long time. He too decided to pocket the money and drive off</i></p>'
+    }
 }
 
 var vignette = background + decision;
@@ -79,7 +98,7 @@ the_experiment.push(MC);
 
 var Justin_Speed = "<p>Justin was able to decide quickly. " 
 
-var Nate_Speed = "<p>Nate was only able to decide after long deliberation. "
+var Nate_Speed = "<p>Nate was only able to decide thinking for a long time. "
 
 var Moral_Decision = "He decided not to steal the money. </p> "
 
@@ -94,7 +113,7 @@ else {
     Nate_Opening = Nate_Speed + Immoral_Decision
 }
 
-var Justin_Questions = [Justin_Opening + "<br>How conflicted do you think Justin felt when making his decision?", "How many reservations do you think Justin had when making his decision?","Do you think Justin was quite certain in his decision?","How far do you think Justin was from choosing the alternate course of action?","Do you think Justin has good or bad moral principles?","Do you think deep down Justin has the moral principles and knowledge to do the right thing?","Do you think Justin has good or bad moral standards?","To what extent do you think Justin remained calm and emotionally contained when making his decision?","To what extent do you think Justin became upset and acted without thinking?"]
+var Justin_Questions = [Justin_Opening + "<br>Do you think Justin felt conflicted when making his decision?", "Do you think Justin had reservations when making his decision?","Do you think Justin felt certain in his decision?","How far do you think Justin was from choosing the alternate course of action?","Do you think Justin has good or bad moral principles?","Do you think deep down Justin has the moral principles and knowledge to do the right thing?","Do you think Justin has good or bad moral standards?","To what extent do you think Justin remained calm and emotionally contained when making his decision?","To what extent do you think Justin became upset and acted without thinking?"]
 
 var s1 = ["Very Conflicted","Not Conflicted"];
 var s2 = ["No Reservations","Many Reservations"];
@@ -114,7 +133,7 @@ var survey_Justin = {
         };
 the_experiment.push(survey_Justin);
 
-var Nate_Questions = [Nate_Opening + "<br>How conflicted do you think Nate felt when making his decision?", "How many reservations do you think Nate had when making his decision?","Do you think Nate was quite certain in his decision?","How far do you think Nate was from choosing the alternate course of action?","Do you think Nate has good or bad moral principles?","Do you think deep down Nate has the moral principles and knowledge to do the right thing?","Do you think Nate has good or bad moral standards?","To what extent do you think Nate remained calm and emotionally contained when making his decision?","To what extent do you think Nate became upset and acted without thinking?"]
+var Nate_Questions = [Nate_Opening + "<br>Do you think Nate felt conflicted when making his decision?", "Do you think Nate had reservations when making his decision?","Do you think Nate felt certain in his decision?","How far do you think Nate was from choosing the alternate course of action?","Do you think Nate has good or bad moral principles?","Do you think deep down Nate has the moral principles and knowledge to do the right thing?","Do you think Nate has good or bad moral standards?","To what extent do you think Nate remained calm and emotionally contained when making his decision?","To what extent do you think Nate became upset and acted without thinking?"]
 
 var survey_Nate = {
             type: 'survey-likert',
@@ -138,7 +157,8 @@ jsPsych.init({
     experiment_structure: the_experiment,
     on_finish: function() {
         var alldata = jsPsych.data.getData();
-        alldata.push({condition: cond})        
+        alldata.push({condition: cond})
+        alldata.push({version: version})          
         turk.submit(alldata)
 
 }
