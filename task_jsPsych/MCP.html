@@ -11,6 +11,7 @@
 	<!-- jsPsych -->
 	<script src="jsPsych-4.0.1/jspsych.js"></script>
 	<script src="jsPsych-4.0.1/plugins/jspsych-survey-likert.js"></script>
+    <script src="jsPsych-4.0.1/plugins/jspsych-survey-text.js"></script>
 	<script src="jsPsych-4.0.1/plugins/jspsych-single-stim.js"></script>
 	<script src="jsPsych-4.0.1/plugins/jspsych-text.js"></script>
     <script src="jsPsych-4.0.1/plugins/jspsych-html.js"></script>
@@ -25,7 +26,7 @@
     </p>
     <button type="button" onclick="this.blur(); experiment.task()">Start</button>
 
-    <p class="block-text" id="legal">Legal information: By answering the following questions, you are participating in a study being performed by cognitive scientists in the Stanford Department of Psychology. If you have questions about this research, please contact Yuan Chang Leong at <a href="mailto://ycleong@stanford.edu">ycleong@stanford.edu</a>.You must be at least 18 years old to participate. Your participation in this research is voluntary. You may decline to answer any or all of the following questions. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.</p>
+    <p class="block-text" id="legal">Legal information: By answering the following questions, you are participating in a study being performed by cognitive scientists in the Stanford Department of Psychology. If you have questions about this research, please contact Yuan Chang Leong at <a href="mailto://ycleong@stanford.edu">ycleong@stanford.edu</a>. You must be at least 18 years old to participate. Your participation in this research is voluntary. You may decline to answer any or all of the following questions. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.</p>
 </div>
 <script src="experiment.js"></script>
 </body>
@@ -56,7 +57,7 @@ the_experiment.push(inst);
 var background ="<p>Justin and Nate were walking to separate cars in the parking lot of Andronico's, a local grocery store, where they each spotted a different lost wallet next to the cars. Upon picking up the wallet and looking inside, each found several hundred dollars in cash. Each man considered whether he should return the wallet and money to the Customer Service desk at Andronico's, or pocket the money and drive away.</p>"
 
 if (cond == 'moral') {
-    decision = '<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He did not steal the money </i> and instead left the wallet with Customer Service</p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation </i>. After several minutes of thinking in his car, <i> he too decided not to steal the money </i> and instead left the wallet with customer service. </i><br> </p>'
+    decision = '<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He did not steal the money </i> and instead left the wallet with Customer Service</p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided not to steal the money </i> and instead left the wallet with customer service. </i><br> </p>'
 }
 else {
     decision ='<p> Justin saw his decision as an easy one and was <i> able to decide quickly. He pocketed the money and drove off. </i></p><p> In contrast, Nate saw his decision as difficult and <i> was only able to decide after long and careful deliberation</i>. After several minutes of thinking in his car, <i> he too decided to pocket the money and drive off</i></p>'
@@ -93,15 +94,15 @@ else {
     Nate_Opening = Nate_Speed + Immoral_Decision
 }
 
-var Justin_Questions = [Justin_Opening + "<br>How conflicted do you think Justin felt when making his decision?", "How many reservations do you think Justin had when making his decision?","Do you think Justin was quite certain in his decision?","How far do you think Justin was from choosing the alternate course of action?","Do you think Justin has good or bad moral principles?","Do you think Justin has good or bad moral standards?","Do you think deep down Justin has the moral principles and knowledge to do the right thing?","To what extent do you think Justin remained calm and emotionally contained when making his decision?","To what extent do you think Justin became upset and acted without thinking?"]
+var Justin_Questions = [Justin_Opening + "<br>How conflicted do you think Justin felt when making his decision?", "How many reservations do you think Justin had when making his decision?","Do you think Justin was quite certain in his decision?","How far do you think Justin was from choosing the alternate course of action?","Do you think Justin has good or bad moral principles?","Do you think deep down Justin has the moral principles and knowledge to do the right thing?","Do you think Justin has good or bad moral standards?","To what extent do you think Justin remained calm and emotionally contained when making his decision?","To what extent do you think Justin became upset and acted without thinking?"]
 
 var s1 = ["Very Conflicted","Not Conflicted"];
 var s2 = ["No Reservations","Many Reservations"];
 var s3 = ["Very Certain","Not Certain"]; 
 var s4 = ["Very Far","Not Far"];
 var s5 = ["Very Bad","Very Good"];
-var s6 = ["Very Bad","Very Good"];
-var s7 = ["Very Unlikely","Very Likely"];
+var s6 = ["Very Unlikely","Very Likely"];
+var s7 = ["Very Bad","Very Good"];
 var s8 = ["To a small extent","To a large extent"]
 var s9 = ["To a small extent","To a large extent"]
 
@@ -113,7 +114,7 @@ var survey_Justin = {
         };
 the_experiment.push(survey_Justin);
 
-var Nate_Questions = [Nate_Opening + "<br>How conflicted do you think Nate felt when making his decision?", "How many reservations do you think Nate had when making his decision?","Do you think Nate was quite certain in his decision?","How far do you think Nate was from choosing the alternate course of action?","Do you think Nate has good or bad moral principles?","Do you think Nate has good or bad moral standards?","Do you think deep down Nate has the moral principles and knowledge to do the right thing?","To what extent do you think Nate remained calm and emotionally contained when making his decision?","To what extent do you think Nate became upset and acted without thinking?"]
+var Nate_Questions = [Nate_Opening + "<br>How conflicted do you think Nate felt when making his decision?", "How many reservations do you think Nate had when making his decision?","Do you think Nate was quite certain in his decision?","How far do you think Nate was from choosing the alternate course of action?","Do you think Nate has good or bad moral principles?","Do you think deep down Nate has the moral principles and knowledge to do the right thing?","Do you think Nate has good or bad moral standards?","To what extent do you think Nate remained calm and emotionally contained when making his decision?","To what extent do you think Nate became upset and acted without thinking?"]
 
 var survey_Nate = {
             type: 'survey-likert',
@@ -122,6 +123,15 @@ var survey_Nate = {
             intervals:[[7,7,7,7,7,7,7,7,7]], // note the the intervals and labels don't necessarily need to match.
         };
 the_experiment.push(survey_Nate);
+
+var comments = ["(Optional) Please leave any comments or suggestions regarding this HIT:"]
+
+var debriefing = {
+    type: 'survey-text',
+    questions: [comments],
+};
+
+the_experiment.push(debriefing);
 
 jsPsych.init({
     display_element: $('#jspsych_target'),
