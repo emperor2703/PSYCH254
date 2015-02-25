@@ -1,13 +1,14 @@
 ---
 title: 'Psych 254 W15 PS #3'
-author: "Mike Frank"
-date: "February 22, 2015"
+author: "Yuan Chang Leong"
+date: "February 23, 2015"
 output: html_document
 ---
 
 This is problem set #3, in which we want you to integrate your knowledge of data wrangling with some basic simulation skills and some linear modeling.
 
 ```{r}
+library(plyr)
 library(dplyr)
 library(ggplot2)
 ```
@@ -20,11 +21,26 @@ Let's start by convincing ourselves that t-tests have the appropriate false posi
 First do this using a `for` loop.
 
 ```{r}
+p.values = NULL
+
+for (i in 1:10000 ) {
+  fake_sample = rnorm(30)
+  res1 = t.test(fake_sample)
+  p.values[i] = res1$p.value
+}
+
+frac_sig = mean(p.values < 0.05)
 ```
 
 Next, do this using the `replicate` function:
 
 ```{r}
+
+?replicate
+
+
+
+
 ```
 
 Ok, that was a bit boring. Let's try something moderately more interesting - let's implement a p-value sniffing simulation, in the style of Simons, Nelson, & Simonsohn (2011).

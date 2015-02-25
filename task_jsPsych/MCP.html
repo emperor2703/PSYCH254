@@ -44,12 +44,16 @@ else {
      var cond = 'immoral';
 }
 
-if (Math.random() < 0.5){
+
+/*if (Math.random() < 0.5){
     var version = 'original';
 }
 else {
     var version = 'new';
 }
+*/
+
+var version = 'original'
 
 var the_experiment = [];
 
@@ -142,6 +146,19 @@ var survey_Nate = {
             intervals:[[7,7,7,7,7,7,7,7,7]], // note the the intervals and labels don't necessarily need to match.
         };
 the_experiment.push(survey_Nate);
+
+
+var final_MC_question = ["How quickly did Justin make his decision?", "How quickly did Nate make his decision?"];
+var scale_1 = ["Very Slowly","Very Quickly"];
+
+var final_MC = {
+            type: 'survey-likert',
+            questions: [final_MC_question],
+            labels: [[scale_1,scale_1]], // need one scale for every question on a page
+            intervals: [[7,7]] // note the the intervals and labels don't necessarily need to match.
+        };
+
+the_experiment.push(final_MC);
 
 var comments = ["(Optional) Please leave any comments or suggestions regarding this HIT:"]
 
