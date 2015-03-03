@@ -1,0 +1,175 @@
+---
+title: "Analysis of Pilot Data"
+output: html_document
+---
+```{r import_libraries, echo = FALSE}
+library("jsonlite")
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+
+sem <- function(x) {sd(x) / sqrt(length(x))}
+ci95 <- function(x) {sem(x) * 1.96}
+```
+
+Reported here are the results from 5 pilot subjects collected on Mechanical Turk. 3 subjects were random assigned to the moral condition and 2 to the immoral condition. Subjects in both conditions read about Justin, who decided quickly, and Nate, who decided slowly. (2 x 2 design with Morality as a between-subjects factor and Speed as a within-subjects factor)   
+
+```{r First_try_at_data_wrangling, echo = FALSE}
+# Get all file names in data_directory
+# file_names = file.path("../pilot_data",list.files("../pilot_data"))
+
+# # run for loop to load all files
+# nSub = length(file_names)
+# d0 = NULL;
+# 
+# for (i in 1:nSub){
+#   temp = data.frame(fromJSON(file_names[i]))
+#   temp$answer.condition = temp$answer.condition[7]
+#   temp$SubID = i;
+#   d0 = bind_rows(d0,temp)
+# }
+# # Data Wrangling
+# d0 = select(d0,SubID,answer.responses,answer.condition) %>%
+#   filter(answer.responses != "NA")
+```
+
+The first order of business is to convert the JSON data into a more suitable format for R. Note: This is really ugly code, probably the ugliest I have ever written - but I have very little experience is text-scraping. If you have suggestions on how to do this more elegantly, please let me know!  
+
+```{r compile_data_second_version}
+# Get all file names in data_directory
+file_names = file.path("../pilot_data",list.files("../pilot_data"))
+
+nSub = length(file_names)
+d0 = NULL;
+
+for (i in 1:nSub){
+  temp = fromJSON(file_names[i])
+  # Ugly data-wrangling
+  d_temp = NULL;
+  d_temp$SubID = rep(i,2)
+  d_temp$Decision = rep(temp$answer$condition[7],2)
+  d_temp$Speed = c("Quick","Slow")
+  d_temp$MC1 = c(substr(temp$answer$responses[2],7,7),substr(temp$answer$responses[2],14,14))
+  d_temp$MC2 = c(substr(temp$answer$responses[5],7,7),substr(temp$answer$responses[5],14,14))
+  d_temp$C1 = c(substr(temp$answer$responses[3],7,7),substr(temp$answer$responses[4],7,7))
+  d_temp$C2 = c(substr(temp$answer$responses[3],14,14),substr(temp$answer$responses[4],14,14))
+  d_temp$C3 = c(substr(temp$answer$responses[3],21,21),substr(temp$answer$responses[4],21,21))
+  d_temp$C4 = c(substr(temp$answer$responses[3],28,28),substr(temp$answer$responses[4],28,28))
+  d_temp$M1 = c(substr(temp$answer$responses[3],35,35),substr(temp$answer$responses[4],35,35))
+  d_temp$M2 = c(substr(temp$answer$responses[3],42,42),substr(temp$answer$responses[4],42,42))
+  d_temp$M3 = c(substr(temp$answer$responses[3],49,49),substr(temp$answer$responses[4],49,49))
+  d_temp$E1 = c(substr(temp$answer$responses[3],56,56),substr(temp$answer$responses[4],56,56))
+  d_temp$E2 = c(substr(temp$answer$responses[3],63,63),substr(temp$answer$responses[4],63,63))
+  d_temp = data.frame(d_temp)
+  d0 = bind_rows(d0,d_temp)
+  }
+
+# convert values to numeric
+d0[,4:14] = apply(d0[,4:14], 2, function(x) as.numeric(x));
+
+# convert reverse coded values
+d0$C1 = d0$C1 * -1 + 8;
+d0$E2 = d0$E2 * -1 + 8;
+
+# Calculate means of measures
+d0 = d0 %>% mutate(C.avg = (C1 + C2 + C3 + C4) /4) %>%
+  mutate(M.avg = (M1 + M2 + M3)/3) %>%
+  mutate(E.avg = (E1 + E2)/2)
+
+# Gather data into long form
+d.tidy = gather(d0,"Question","Response",4:14)
+head(d.tidy)
+```
+
+Now that we have the data in an appropriate format. We can proceed with our analyses. 
+
+**Manipulation Check**  
+Immediately after reading the vignette about Justin and Nate, participants rated how quickly Justin and Nate made their decision. Participants made the ratings again at the end of the experiment. These ratings serve as our manipulation checks, to ensure that participants are aware of the speed manipulation in our experiment. 
+
+
+```{r Manipulation check}
+# Manipulation Check 
+MC1 = d.tidy %>% filter(Question == "MC1") %>%
+  group_by(Speed) %>%
+  summarise(Avg = mean(Response),CI = ci95(Response))
+MC1$Order = 1;
+
+MC2 = d.tidy %>% filter(Question == "MC2") %>%
+  group_by(Speed) %>%
+  summarise(Avg = mean(Response),CI = ci95(Response))
+MC2$Order = 2;
+
+MC = bind_rows(MC1,MC2)
+
+# Plot
+ggplot(MC, aes(x=Speed, y=Avg)) + 
+  geom_bar(stat="identity",width=0.5) +
+  geom_errorbar(aes(ymax = Avg + CI, ymin= Avg - CI), width=0.15) +
+  facet_grid(~ Order) + 
+  ylab("How quickly was the decision made? 1 = Slow, 7 = Quick")
+```
+
+Let's use a paired t-test to test if participants rated Quick Justin as acting more quickly than Slow Nate.  
+
+```{r}
+# T-test for MC 1
+MC1 = d.tidy %>% filter(Question == "MC1") 
+t.test(Response~Speed,MC1,paired = TRUE)
+
+# T-test for MC 1
+MC2 = d.tidy %>% filter(Question == "MC2") 
+t.test(Response~Speed,MC2,paired = TRUE)
+```
+
+Participant rated Quick Justin as faster than Slow Nate in both manipulation checks (MC1: t(4) = 3.9, p = 0.018; MC2: t(4) = 3.67, p = 0.021).  
+
+We will also use the manipulation checks to exclude subjects. While the original study did not exclude any subjects, we decided to be more stringent with the participants we include in the replication due to the heterogeneity of the sample on mechanical turk. Subjects had to rate Justin as faster than Nate on both manipulation checks to be included in the study.
+
+```{r}
+Pass2 = spread(MC2,Speed,Response) %>%
+  mutate(Pass2 = Quick > Slow)
+
+Pass = spread(MC1,Speed,Response) %>%
+  mutate(Pass1 = Quick > Slow) %>%
+  select(c(SubID,Pass1)) %>% 
+  left_join(Pass2,by = "SubID") %>%
+  select(SubID,Pass1,Pass2) %>%
+  mutate(Passed = Pass1 & Pass2)
+  
+included = Pass$SubID[Pass$Passed] 
+  
+cat(sum(Pass$Passed),paste("subjects included."),sum(!Pass$Passed),paste("subjects excluded."))
+```
+
+Since excluding this subject would leave only one subject in the immoral condition, we'll keep the subject for the purpose of this analysis.
+
+
+```{r}
+# Exclude Subject
+# d.included = d.tidy %>% filter(SubID %in% included)
+
+# Not excluding for pilot data
+d.included = d.tidy
+
+
+
+
+
+# Plot means by decision by speed
+ggplot(gg) +
+  geom_bar(aes(x=Method, y=value, fill=Metric), stat="identity",
+           position="dodge")+facet_wrap(~variable)
+
+# Interaction
+
+
+# Simple Effects
+
+
+# Mediation 
+
+
+
+```
+
+
