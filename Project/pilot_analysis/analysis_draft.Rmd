@@ -40,7 +40,7 @@ The first order of business is to convert the JSON data into a more suitable for
 
 ```{r compile_data_second_version}
 # Get all file names in data_directory
-file_names = file.path("../pilot2data",list.files("../pilot2data"))
+file_names = file.path("../bothpilotdata",list.files("../bothpilotdata"))
 
 nSub = length(file_names)
 d0 = NULL;
@@ -67,9 +67,8 @@ for (i in 1:nSub){
   d0 = bind_rows(d0,d_temp)
   }
 
-# convert values to appropriate type
+# convert values to numeric
 d0[,4:14] = apply(d0[,4:14], 2, function(x) as.numeric(x));
-d0$SubID = factor(d0$SubID)
 
 # convert reverse coded values
 d0$C1 = d0$C1 * -1 + 8;
@@ -82,6 +81,7 @@ d0 = d0 %>% mutate(C.avg = (C1 + C2 + C3 + C4) /4) %>%
 
 # Gather data into long form
 d.tidy = gather(d0,"Question","Response",4:17)
+d.tidy$SubID = factor(d.tidy$SubID)
 head(d.tidy)
 ```
 
@@ -175,14 +175,15 @@ d.moral.summary = d.moral %>%
 # Plot means by decision by speed
 ggplot(d.moral.summary, aes(x=Decision,y=Avg,fill=Speed)) +
   geom_bar(stat="identity", position=position_dodge()) +
-  geom_errorbar(aes(ymax = Avg + CI, ymin =Avg - CI), width=.2, position=position_dodge(.9)) +
-  ylab("Morality Ratings")
+  geom_errorbar(aes(ymax = Avg + CI, ymin =Avg - CI), width=.p2, position=position_dodge(.9)) + ylab("Morality Ratings")
 ```
 
-The plot suggests that there is a Decision X Speed interaction on Moral Evaluation. We will formally test for this interaction using a mixed anova. Note: This could also be done using mixed models, would be interested to talk about what's the best model to specify :)
-
+The plot suggests that there is a Decision X Speed interaction on Moral Evaluation. We will formally test for this interaction using a mixed anova.
 
 ```{r}
+d.moral$SubID = factor(d.moral$SubID)
+d.moral$Decision = factor(d.moral$Decision)
+
 # 2x2 mixed:
 # IV between: Decision
 # IV within:  Speed
@@ -213,6 +214,8 @@ Next, we test the hypothesis that the decision x speed interaction on moral eval
 4. Test for the effect of certainty on moral evaluation separetly for both conditions
 5. See that in both simple effects analyses, there is a significant slope (i.e. significant effect of certainty), and insignificant intercept (i.e. no difference in moral evaluation between Quick Justin and Slow Nate).
 
+First, we test to see that faster decisions were perceived as more certain. 
+
 ```{r}
 d.certain = d.included %>% 
   filter(Question == "C.avg")
@@ -238,10 +241,9 @@ res3 = lmer(M.avg ~ Decision * C.avg + (1|SubID),d.certainty.moral)
 summary(res3)
 ```
 
-Yes, there is a Decision X Certainty interaction on moral evaluation (b = -1.2, t(2) = -8,8, p = 0.02). Now we convert certainty and moral evaluation to difference scores, and test for the effect of certainty on moral evaluation separetly for both conditions.
+Yes, there is a Decision X Certainty interaction on moral evaluation (b = -1.2, t(2) = -8,8, p = 0.02). 
 
 ```{r}
-
 d_M.diff = spread(d.moral,Speed,Response) %>%
   mutate(M.diff = Quick - Slow) %>%
   select(SubID,Decision,M.diff)
@@ -256,9 +258,12 @@ d_mediation = bind_cols(d_M.diff,d_C.diff) %>%
 res4 = lm(M.diff ~ C.diff, d_mediation[d_mediation$Decision == "moral",])
 summary(res4)
 
-res5 = lm(M.diff ~ C.diff, d_mediation[d_mediation$Decision == "immoral",])
-summary(res5)
+
+
+
+# res4 = lmer(formula = scale(M.avg,scale =F) ~ scale(C.avg, scale = F) + (1|SubID), data = d.certainty.moral[d.certainty.moral$Decision == "moral", ])
+# summary(res4)
+# 
+# res5 = lmer(formula = scale(M.avg, scale = F) ~ C.avg + (1|SubID), data = d.certainty.moral[d.certainty.moral$Decision == "immoral", ])
+# summary(res5)
 ```
-
-Not enough data to run this test! 
-

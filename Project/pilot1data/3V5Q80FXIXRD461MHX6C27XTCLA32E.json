@@ -1,0 +1,73 @@
+{
+    "ApprovalTime": "2015-03-01T06:59:08Z",
+    "AutoApprovalTime": "2015-03-01T06:55:23Z",
+    "AssignmentId": "3V5Q80FXIXRD461MHX6C27XTCLA32E",
+    "WorkerId": "A423QQ5WN43B9",
+    "AcceptTime": "2015-03-01T06:49:41Z",
+    "HITId": "3UZUVSO3P7V3YONJQW1RBNJ3FL6EM3",
+    "Assignment": "",
+    "answer": [
+        {
+            "rt": 4461,
+            "trial_type": "text",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 4568,
+            "key_press": 13,
+            "trial_index": 0,
+            "trial_index_global": 0
+        },
+        {
+            "rt": 3579,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":5,\"Q1\":5}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 8188,
+            "trial_index": 0,
+            "trial_index_global": 1
+        },
+        {
+            "rt": 9515,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":5,\"Q1\":3,\"Q2\":4,\"Q3\":6,\"Q4\":6,\"Q5\":5,\"Q6\":5,\"Q7\":5,\"Q8\":6}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 18779,
+            "trial_index": 0,
+            "trial_index_global": 2
+        },
+        {
+            "rt": 11750,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":5,\"Q1\":3,\"Q2\":5,\"Q3\":6,\"Q4\":6,\"Q5\":3,\"Q6\":5,\"Q7\":5,\"Q8\":5}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 31612,
+            "trial_index": 0,
+            "trial_index_global": 3
+        },
+        {
+            "rt": 2454,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":5,\"Q1\":5}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 35099,
+            "trial_index": 0,
+            "trial_index_global": 4
+        },
+        {
+            "rt": 1226,
+            "trial_type": "survey-text",
+            "responses": "{}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 37334,
+            "trial_index": 0,
+            "trial_index_global": 5
+        },
+        {
+            "condition": "immoral"
+        },
+        {
+            "version": "original"
+        }
+    ],
+    "AssignmentStatus": "Approved",
+    "SubmitTime": "2015-03-01T06:50:23Z"
+}

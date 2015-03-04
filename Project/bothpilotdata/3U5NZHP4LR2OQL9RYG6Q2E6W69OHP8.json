@@ -1,0 +1,73 @@
+{
+    "ApprovalTime": "2015-03-03T00:39:06Z",
+    "AutoApprovalTime": "2015-03-03T00:34:56Z",
+    "AssignmentId": "3U5NZHP4LR2OQL9RYG6Q2E6W69OHP8",
+    "WorkerId": "AEVU71Z2FDTUX",
+    "AcceptTime": "2015-03-03T00:26:39Z",
+    "HITId": "3GONHBMNHVY19JEFMJF4WXKL3ULMZT",
+    "Assignment": "",
+    "answer": [
+        {
+            "rt": 6402,
+            "trial_type": "text",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 6548,
+            "key_press": 13,
+            "trial_index": 0,
+            "trial_index_global": 0
+        },
+        {
+            "rt": 98930,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":7,\"Q1\":3}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 105513,
+            "trial_index": 0,
+            "trial_index_global": 1
+        },
+        {
+            "rt": 39222,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":7,\"Q1\":1,\"Q2\":1,\"Q3\":1,\"Q4\":7,\"Q5\":7,\"Q6\":7,\"Q7\":6,\"Q8\":1}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 145810,
+            "trial_index": 0,
+            "trial_index_global": 2
+        },
+        {
+            "rt": 35573,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":3,\"Q1\":5,\"Q2\":6,\"Q3\":6,\"Q4\":4,\"Q5\":2,\"Q6\":4,\"Q7\":5,\"Q8\":3}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 182426,
+            "trial_index": 0,
+            "trial_index_global": 3
+        },
+        {
+            "rt": 6863,
+            "trial_type": "survey-likert",
+            "responses": "{\"Q0\":7,\"Q1\":2}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 190300,
+            "trial_index": 0,
+            "trial_index_global": 4
+        },
+        {
+            "rt": 1660,
+            "trial_type": "survey-text",
+            "responses": "{}",
+            "internal_chunk_id": "0-0",
+            "time_elapsed": 192965,
+            "trial_index": 0,
+            "trial_index_global": 5
+        },
+        {
+            "condition": "moral"
+        },
+        {
+            "version": "original"
+        }
+    ],
+    "AssignmentStatus": "Approved",
+    "SubmitTime": "2015-03-03T00:29:56Z"
+}
