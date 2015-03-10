@@ -1,3 +1,5 @@
+<style> div.comment {color: blue} </style>
+
 ---
 title: 'Psych 254 W15 PS #3'
 author: "Yuan Chang Leong"
@@ -9,6 +11,7 @@ This is problem set #3, in which we want you to integrate your knowledge of data
 
 ```{r}
 library(plyr)
+library(tidyr)
 library(dplyr)
 library(ggplot2)
 ```
@@ -30,18 +33,28 @@ for (i in 1:10000 ) {
 }
 
 frac_sig = mean(p.values < 0.05)
+
+cat(paste("False Positive Rate ="), frac_sig)
 ```
 
 Next, do this using the `replicate` function:
 
 ```{r}
+p.values = NULL
+foo = function(n) {
+  fake_sample = rnorm(n)
+  res1 = t.test(fake_sample)
+  res1$p.value < 0.05
+  }
 
-?replicate
-
-
-
-
+frac_sig = mean(replicate(10000,foo(30)))
+cat(paste("False Positive Rate ="), frac_sig)
 ```
+
+<div class = "comment">
+False positive rate is approximately 0.05 in both cases.
+</div>
+<br>
 
 Ok, that was a bit boring. Let's try something moderately more interesting - let's implement a p-value sniffing simulation, in the style of Simons, Nelson, & Simonsohn (2011).
 
@@ -50,17 +63,41 @@ Consider this scenario: you have done an experiment, again with 30 participants 
 First, write a function that implements this sampling regime.
 
 ```{r}
-double.sample <- function () {
+double.sample <- function (n) {
+  fake_sample = rnorm(n)
+  res1 = t.test(fake_sample)
+  if (res1$p.value < 0.05)
+    {
+    return(1)
+    } else if (res1$p.value > 0.25)
+      {
+      return(0)
+      } else 
+        {
+        fake_sample = append(fake_sample,rnorm(n))
+        res1 = t.test(fake_sample)
+        if (res1$p.value < 0.05)
+          {
+          return(1)} else {
+            return(0)
+          }
+        }
 }
 ```
 
 Now call this function 10k times and find out what happens. 
 
 ```{r}
+frac_sig = mean(replicate(10000,double.sample(30)))
+cat(paste("False Positive Rate ="), frac_sig)
 ```
 
 Is there an inflation of false positives? How bad is it?
 
+<div class = "comment">
+False positive rate is inflated to about 0.07.
+</div>
+<br>
 Now modify this code so that you can investigate this "double the sample" rule in a bit more depth. Let's see what happens when you double the sample ANY time p > .05 (not just when p < .25), or when you do it only if p < .5 or < .75. How do these choices affect the false positive rate?
 
 HINT: Try to do this by making the function `double.sample` take the upper p value as an argument, so that you can pass this through dplyr.
@@ -68,10 +105,46 @@ HINT: Try to do this by making the function `double.sample` take the upper p val
 HINT 2: You may need more samples. Find out by looking at how the results change from run to run.
 
 ```{r}
+# Modify function
+double.sample_v2 <- function (n,p_high) {
+  fake_sample = rnorm(n)
+  res1 = t.test(fake_sample)
+  if (res1$p.value < 0.05)
+    {
+    return(1)
+    } else if (res1$p.value > p_high)
+      {
+      return(0)
+      } else 
+        {
+        fake_sample = append(fake_sample,rnorm(n))
+        res1 = t.test(fake_sample)
+        if (res1$p.value < 0.05)
+          {
+          return(1)} else {
+            return(0)
+          }
+        }
+}
+
+# Double any time p > 0.05 and p < 0.5
+frac_sig = mean(replicate(50000,double.sample_v2(30,0.5)))
+cat(paste("False Positive Rate ="), frac_sig)
+
+# Double if p > 0.05 and p < 0.75
+frac_sig = mean(replicate(50000,double.sample_v2(30,0.75)))
+cat(paste("False Positive Rate ="), frac_sig)
+
+# Double any time p > 0.05
+frac_sig = mean(replicate(50000,double.sample_v2(30,1)))
+cat(paste("False Positive Rate ="), frac_sig)
 ```
 
 What do you conclude on the basis of this simulation? How bad is this kind of data-dependent policy?
 
+<div class = comment>
+Data-dependent data collection increases false positives rate above the preset-level of 0.05. The false positive rate becomes increasingly inflated as we lower our threshold for deciding whether to double the sample. 
+</div>
 
 Part 2: The Linear Model
 ========================
@@ -85,54 +158,100 @@ and vitamin C. This is super simple. (Try `?ToothGrowth`).
 First plot the data, we'll use `qplot` to understand how `len` (tooth length) depends on `dose` (amount of Vitamin C) and `supp` (delivery method).
 
 ```{r}
+d0 = ToothGrowth
+qplot(dose,len,data = d0, facets = ~supp)
 ```
 
 So now you see what's going on. 
+<div class = comment>
+Seems like there's a main effect of dose - greater dose of vitamin C leads to longer teeth, and a possible interaction between dose and delivery method - greater effect of dose on length for guinea pigs in the ascorbic acid condition. 
+</div>
+<br>
 
 Next, always make a histogram of the DV before making a linear model! This reveals the distribution and can be helpful in choosing your model type.
 
 ```{r}
+hist(d0$len)
 ```
 
 Now make a linear model of tooth lengths using `lm`. Try making one with main effects and interactions and another with just main  effects. Make sure to assign them to variables so that you can get them later.
 
 ```{r}
+res2 = lm(len ~ dose * supp, d0); summary(res2)
+
+res3 = lm(len ~ dose + supp, d0); summary(res3)
 ```
 
 Now try taking out the intercept, using a -1 term in the formula. what does this do?
 
 ```{r}
+res4=(lm(len ~ dose + supp - 1,d0));summary(res4)
 ```
+
+<div class = comment>
+By taking out the intercept, we now estimate coefficients for both levels of `supp`, rather than taking one level as a reference group and estimating the difference from the reference. 
+</div>
+<br>
 
 Thought question: Take a moment to interpret the coefficients of the model. 
 Q1 - What are the units?
+<div class = comment>
+The units are in length of teeth. More specifically,they represent change in length of teeth per unit change of the predictor variable. 
+</div>
+<br>
 Q2 - How does the interaction relate to the plot?
+<div class = comment>
+There is a greater effect of dose on length in the ascorbic acid condition than in the orange juice condition. 
+</div>
+<br>
+
 Q3 - Should there be an interaction in the model? What does it mean? How important is it?
 
-Now make predictions from the model you like the best. What should happen with
-doses of 0, 1.5, 2.5, and 10 under both supplements? 
+```{r}
+anova(res3,res2)
+```
+
+<div class = comment>
+Yes, there should be an interaction. Adding the interaction term significantly improves the fit of the model (F(1), 5.33, p=0.03).  
+</div> 
+<br>
+
+Now make predictions from the model you like the best. What should happen with doses of 0, 1.5, 2.5, and 10 under both supplements? 
 
 HINT: use the `predict` function ...
 
 HINT 2: you will have to make a dataframe to do the prediction with, so use something like `data.frame(dose=...)`.
 
 ```{r}
+toPredict = data.frame(dose = rep(c(0,1.5,2.5,10),2),supp = c(rep("OJ",4),rep("VC",4)))
+
+prediction = predict(res2,toPredict); 
+names(prediction) = paste(toPredict$supp,toPredict$dose);
+prediction
 ```
 
 Now plot the residuals from the original model. How do they look?
 HINT: `?resid`
 
 ```{r}
+hist(res2$resid)
 ```
 
-
+<div class = comment>
+They look pretty normal. 
+</div> 
+<br>
 BONUS: test them for normality of distribution using a quantile-quantile plot.
 
 HINT: `?qqplot` and `?qqnorm`
 
 ```{r}
+qqnorm(res2$resid);qqline(res2$resid)
 ```
-
+<div class = comment>
+Sample quantiles line up nicely with theoretical quantiles. Seems like the residuals are normally distributed.
+</div>
+<br>
 
 2B: Exploratory Linear Modeling
 -------------------------------
@@ -142,18 +261,46 @@ What the heck is going on? Load data from Frank, Vul, Saxe (2011, Infancy), a st
 Try to figure out what the most reasonable linear model of the data is.
 
 ```{r}
-d <- read.csv("../data/FVS2011-hands.csv")
+d1 <- read.csv("../data/FVS2011-hands.csv")
+head(d1)
 
+#age only 
+res.age = lm(hand.look ~ age,d1);
+
+#condition only
+res.condition = lm(hand.look ~ condition, d1)
+
+#age + condition
+res.add = lm(hand.look ~ age + condition, d1)
+
+# Test if adding a variable significantly improves model fits
+anova(res.age,res.add)
+anova(res.condition,res.add)
+
+cat("The additive model fits better than models with only 1 predictor.")
+
+#age x condition
+res.int = lm(hand.look ~ age * condition, d1)
+anova(res.add,res.int)
 ```
+
+Looks like the full interaction model is the best model.  
 
 Plot that model on the same plot as the data.
 
 HINT: you can do this either using `predict` or (if you are feeling confident of your understanding of the models) using the built-in linear models in `ggplot`'s `geom_smooth`. 
 
 ```{r}
+ggplot(d1, aes(x=age,y=hand.look, color=condition)) +
+  geom_point() +
+  geom_smooth(se=F, method="lm")
 ```
 
 What do you conclude from this pattern of data?
+
+<div class = comment>
+Older participants are more likely to look at hands than younger participants. Participants in the Faces Plus condition are more likely to look at hands than participants in the Faces Medium condition. There is also an interaction between age and condition on how much participants look at hands. Older participants are more likely to look at hands in the Faces Plus condition relative to the Faces Medium condition, than are the younger participants.  
+</div> 
 
 3: Linear Mixed Effect Models
 =============================
@@ -171,6 +318,7 @@ d$age.group <- factor(d$age.group)
 Always begin with a histogram!
 
 ```{r}
+hist(d$correct)
 ```
 
 Brief Confidence Interval Digression
@@ -179,15 +327,19 @@ Brief Confidence Interval Digression
 Start out by setting up a function for a 95% CI using the normal approximation.
 
 ```{r}
+sem <- function(x) {sd(x) / sqrt(length(x))}
 ci95.norm <- function(x) {
-}
+  c(mean(x) - sem(x) * 1.96,
+    mean(x) + sem(x) * 1.96)
+  }
 ```
 
 But the number of participants in a group is likely to be < 30, so let's also compute this with a t distribution.
 
 ```{r}
 ci95.t <- function(x) {
-}
+  c(mean(x) - sem(x) * qt(.975,length(x), lower.tail=T),
+  mean(x) + sem(x) * qt(.975,length(x), lower.tail=T))}
 ```
 
 On the other hand, maybe we should use bootstrap CIs because these are actually  proportions, and the normal/t approximations don't know that they are 0/1 bounded.
@@ -201,6 +353,7 @@ Take a look at `?boot` and `?bootci`. Note that the syntax for the `boot` librar
 
 ```{r}
 theta <- function(x,xdata,na.rm=T) {mean(xdata[x],na.rm=na.rm)}
+
 ci.low <- function(x,na.rm=T) {
   mean(x,na.rm=na.rm) - 
     quantile(bootstrap(1:length(x),
@@ -219,14 +372,42 @@ Now make 95% confidence intervals across participants using all the methods abov
 - Bootstrap percentile using my code
 
 ```{r}
+# CI Normal
+ci95.norm(d$correct)
+
+# CI T
+ci95.t(d$correct)
+
+# bookstrap ci
+toBoot = boot(d$correct, function(x,i){return(mean(x[i]))}, R=1000)
+boot.ci(toBoot, type="bca")
+
+# ci.low, ci.high
+CIs = c(mean(d$correct) - ci.low(d$correct), mean(d$correct) + ci.high(d$correct))
+CIs
 ```
 
 Now plot the data by age and condition using `dplyr` and `ggplot2`. Plot some CIs on here - extra credit if you plot all of them and compare visually (you'll need `position = position_dodge()` or some other way to offset them).  
 
 ```{r}
+d_m= d %>% 
+  group_by(age.group,condition) %>%
+  summarise(mean = mean(correct),
+            ci.lo = mean(correct) - ci.low(correct),
+            ci.hi = mean(correct) + ci.high(correct)) 
+
+ggplot(d_m, aes(x=age.group, y=mean)) + 
+  facet_wrap( ~ condition) +
+  geom_bar(stat="identity",width=0.5) +
+  geom_errorbar(aes(ymax = ci.hi, ymin= ci.lo), width=0.15)
 ```
 
 What do you conclude about confidence interval computation?
+
+<div class = "comment">
+There are many ways of computing it. One should always think about the nature of the data and assumptions being made when computing confidence intervals.
+</div>
+
 
 Back to LMEMs
 -------------
@@ -240,11 +421,20 @@ OK, now do a basic GLM over the entire data frame, using `age.group`, `condition
 NOTE: this model is not appropriate, because it assumes that each subject's observations are independent from one another. It's still fine to do the analysis, though: it can tell you a lot about the data and is easy and fast to fit, as long as you know that you can't trust the p-values!
 
 ```{r}
+res.glm = glm(correct ~ age.group * condition, d, family = "binomial")
+summary(res.glm)
 ```
 
 Let's now use `dplyr` to get data frames for by-items (`msi`) and by-subjects (`mss`) analyses. `msi` should contain the mean ratings for every item and `mss` should contain the mean ratings for every subject.
 
 ```{r}
+msi = d %>% 
+  group_by(trial,condition) %>% 
+  summarise(mean = mean(correct))
+
+mss = d %>%
+  group_by(trial,subid) %>% 
+  summarise(mean = mean(correct))
 ```
 
 Now do standard linear models on each of these.
@@ -252,11 +442,17 @@ Now do standard linear models on each of these.
 NOTE: These are not strictly correct either because of the normal approximation on percent correct (model doesn't know it's 0 - 1 bounded and could give you standard error that goes above 1). Again, useful to do and see what happens.
 
 ```{r}
+res.item = lm(mean ~ trial,msi); summary(res.item)
+
+res.sub = lm(mean ~ subid,mss); summary(res.sub)
 ```
 
 Do ANOVA on these. Note that ANOVA doesn't let you figure out what is going on with individual levels of age.
 
 ```{r}
+summary(aov(mean ~ trial, msi))
+
+summary(aov(mean ~ subid, mss))
 ```
 
 On to linear mixed effect models. Create the maximal random effects model a la Barr et al. (2013). Does it converge? If not, what will you do to make it converge? (The internet can be your friend here).
@@ -265,23 +461,57 @@ HINT: try simplifying your model to a "semi-maximal" model. Bonus: try using a d
 
 HINT: make sure that you consider which random effects are appropriate. Consider which observations are within/between subjects. E.g. having a random coefficient for age by subject doesn't make sense, because each subject has only one age.
 
-
 ```{r}
+res.full = glmer(correct ~ age.group * condition + (trial|subid) + (1|trial), d, family = "binomial")
+
+res.semi = glmer(correct ~ age.group * condition + (1|subid) + (1|trial), d, family = "binomial"); summary(res.semi)     
+
+summary(res.glm)
 ```
 
 How do these coefficients compare with the independent coefficients linear model? What do you conclude?
 
+<div class = comment>
+They seem to be quite similar. The random effects in this study does not seem to systematically bias the fixed effects. 
+</div>
+<br>
+
 Which random effects make the most difference? Find out using `ranef`. Plot the random effects for subject and item.
 
 ```{r}
+var(ranef(res.semi)$subid[,1])
+var(ranef(res.semi)$trial[,1])
+
+hist(ranef(res.semi)$subid[,1])
+hist(ranef(res.semi)$trial[,1])
 ```
+
+<div comment = class>
+Seems like the item (trial) random effects is the greatest. 
+</div>
+<br>
 
 Make the minimal random effects model with just a subject intecept. How does this compare?
 
 ```{r}
+res.int = glmer(correct ~ age.group * condition + (1|subid),d,family = "binomial")
+summary(res.int)
+
+anova(res.int,res.semi)
 ```
 
-Get an estimate of the significance value for the coefficient on the `age*condition` interaction by using anova to compare between your semi-maximal model and the model without an intercept.
+<div class = comment>
+There doesn't seem to be much difference in coefficients of the fixed effects. Comparing the models using an anova indicates that the more complex semi-maximal model provided only a marginally better fit than the minimal random effects model. 
+</div>
+<br>
+Get an estimate of the significance value for the coefficient on the `age*condition` interaction by using anova to compare between your semi-maximal model and the model without an intercept. <div class = comment>(I assume you mean without an interaction?)</div>
 
 ```{r}
+res.nointeraction = glmer(correct ~ age.group + condition + (1|subid) + (1|trial), d, family = "binomial"); summary(res.nointeraction)
+
+anova(res.nointeraction,res.semi)
 ```
+
+<div class = comment>
+The semi-maximal model provides a better fit than the no interaction model (F(2) = 12.0, p = 0.002). 
+</div>
