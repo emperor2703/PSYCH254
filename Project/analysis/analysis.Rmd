@@ -29,7 +29,7 @@ ci.high <-
 
 Reported here are the results from the replication of Critcher et al. (2013). This replication was conducted by Yuan Chang Leong as part of the course requirements of PSYCH254: Lab in Experimental Methods, taught by Professor Michael Frank at Stanford University, Winter Quarter 2014/2015.   
 
-Participants read a vignette about two targets, Justin and Nate, who chose to act either morally (moral condition) or immorally (immoral condition). Justin made his decision quickly, while Nate made his decision slowly. We had participants rate the moral character of Justin and Nate, and investigated if decision speed influenced judgments of moral character. For more information, please see the written report available <div class = coments> here: <br><br></div>  
+Participants read a vignette about two targets, Justin and Nate, who chose to act either morally (moral condition) or immorally (immoral condition). Justin made his decision quickly, while Nate made his decision slowly. We had participants rate the moral character of Justin and Nate, and investigated if decision speed influenced judgments of moral character. For more information, please see the written report [here](http://web.stanford.edu/~ycleong/Projects/PSYCH254/Project/YLEONG_ReplicationReport.pdf). You can also access the experimental task [here.](http://web.stanford.edu/~ycleong/Projects/PSYCH254/task_jsPsych/MCP.html) <br>
 
 119 participants were recruited from Amazon Mechanical Turk. 56 participants were randomly assigned to the moral condition and 63 were randomly assignned to the immoral condition.  
 
@@ -41,9 +41,9 @@ head(d.tidy)
 
 Manipulation Check  
 -------------------
-Immediately after reading the vignette about Justin and Nate, participants rated how quickly Justin and Nate made their decision. Participants made the ratings again at the end of the experiment. These ratings serve as our manipulation checks, to ensure that participants were aware of the speed manipulation in our experiment. 
+Immediately after reading the vignette about Justin and Nate, participants rated how quickly Justin and Nate made their decision. Participants made the ratings again at the end of the experiment. These ratings served as our manipulation checks to ensure that participants were aware of the speed manipulation in our experiment. 
 
-```{r Manipulation check, fig.width = 5, fig.height = 4}
+```{r Manipulation check, fig.width = 5, fig.height = 5, fig.align='center'}
 # Manipulation Check 1
 MC1 = d.tidy %>% filter(Question == "MC1") %>%
   group_by(Speed) %>%
@@ -81,7 +81,7 @@ MC2 = d.tidy %>% filter(Question == "MC2")
 t.test(Response~Speed,MC2,paired = TRUE)
 ```
 
-Participants rated how quickly each target made his decision immediately after they read the vignette and at the end of the experiment. In both cases, quick Justin was rated as having made his decision more quickly than slow Nate (Fig. 1, at the start of the experiment: t(119) = 31.32, p < 0.001, at the end of the experiment t(119) = 30.93, p < 0.001)
+In both cases, quick Justin was rated as having made his decision more quickly than slow Nate (Fig. 1, at the start of the experiment: t(119) = 31.32, p < 0.001, at the end of the experiment t(119) = 30.93, p < 0.001)
 
 We used the manipulation checks to exclude subjects. While the original study did not exclude any subjects, we will be more stringent with the participants we include in the replication due to the heterogeneity of the sample on mechanical turk. Subjects had to rate Justin as faster than Nate on both manipulation checks to be included in the study.  
 
@@ -107,7 +107,7 @@ Decision X Speed Interaction
 -------------------
 To investigate the effect of decision and decision speed on moral evaluation, we plotted participants’ moral evaluations of the target by decision and decision speed (Fig. 2)
 
-```{r fig.width = 3, fig.height=5}
+```{r fig.width = 4, fig.height=5,fig.align='center'}
 # Exclude Subject
 d.included = d.tidy %>% filter(SubID %in% included)
 
@@ -131,6 +131,7 @@ ggplot(d.moral.summary, aes(x=Decision,y=Avg,fill=Speed)) +
   coord_cartesian(ylim = c(2, 7)) +
   theme(legend.position="top")
 ```
+
 **Figure 2**. Moral character evaluation by decision and speed. Error bars denote 95% confidence intervals. 
 
 The plot suggests that there is a Decision X Speed interaction on Moral Evaluation. Let's formally test this using a linear mixed effects model.  
@@ -192,6 +193,8 @@ There is a significant interaction between decision and perceived certainty on m
 
 3. To formally test if perceived certainty mediated the interaction between decision and speed on moral evaluation, we ran several simple slope analyses by examining the relationship between speed, certainty and moral evaluation separately for participants in the moral condition and participants in the immoral condition.  
 
+**Moral Condition**  
+
 ```{r}
 # Moral condition
 # Speed --> Certain
@@ -227,6 +230,7 @@ p = 2*(pnorm(sobelz,lower.tail = F)); p
 
 When targets returned the wallet (moral condition), Quick Justin was rated as more certain than Slow Nate (b = 3.67, t(104) = 19.91, p < 0.001). Quick Justin was also rated as more moral than Slow Nate (b = 1.15, t(52) = 8.892, p < 0.001), but the effect of speed on moral evaluation was reduced and became only marginally significant when accounting for the effect of perceived certainty (b = 0.49, t(643) = 1.69, p = 0.10). A significant Sobel test indicated that the effect of speed on moral evaluation was mediated by perceived certainty (z = 2.5, p = 0.013).
 
+**Immoral Condition**  
 ```{r}
 #Immoral condition
 # Speed --> Certain
@@ -263,6 +267,7 @@ When targets stole the money (immoral condition), Quick Justin was also rated as
 
 Given that perceived certainty mediated the effect of decision speed on moral evaluation both when targets chose to act morally and when targets chose to act immorally, we can conclude that perceived certainty mediated the interaction between decision and decision speed on moral evaluation (Fig. 3).  
 
-<center><img src="PathModel_R.png"></img></center>  
+<center><img src="PathModel_R.png"></img></center>  <br>
+**Figure 3.** Path model summarizing proposed relationship between decision, decision speed, perceived certainty and moral evaluation. Targets’ decision had a direct main effect on moral evaluation. The decision x speed interaction on moral evaluation was fully mediated by perceived certainty. Numbers denote unstandardized regression coefficients. Blue path indicates simple effects when targets acted morally while red path indicates simple effects when targets acted immorally.+ p < 0.1, * p < 0.05, ** p < 0.01,*** p < 0.001. 
 
 
